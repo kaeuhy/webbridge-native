@@ -9,7 +9,7 @@
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint placeholder'",
-    "test": "echo 'test placeholder'"
+    "test": "jest"
   },
   "license": "MIT",
   "publishConfig": {
