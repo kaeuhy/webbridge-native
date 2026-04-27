@@ -13,11 +13,23 @@
 
 **WebBridge Native** bridges that gap. It brings browser networking semantics to React Native through native-level interception, not JS monkey-patching.
 
+## Why not existing solutions?
+
+| Existing | What it does | What it doesn't |
+|---|---|---|
+| MSW (`msw/native`) | MSW DSL in RN | No DevTools visibility, no semantic integration |
+| `@react-native-cookies/cookies` | Cookie get/set | No auto-management, no RFC 6265 |
+| RN 0.81+ DevTools | Auto-records fetch/XHR | No mock visibility, no cookie/cache semantics |
+| `react-native-network-logger` | Network inspection | No mocking, no semantics |
+
+**WebBridge Native** is the only library that integrates cookies + cache + redirect + headers + CORS semantics with MSW-compatible mocking and native visibility in one place.
+
 ## Key Features
 
 - **Cookie Jar** — RFC 6265 compliant, automatic management with persistence
 - **Header Normalizer** — Browser-like User-Agent, Accept-Language, Origin injection
 - **MSW-compatible Mock** — Same DSL as MSW v2, but visible in RN DevTools
+- **Semantic Integration** — Cookies, cache, redirect, headers working together per browser standards
 - **Native Visibility** — All requests go through NSURLProtocol (iOS) / OkHttp Interceptor (Android)
 - **Opt-out Friendly** — Use only what you need
 
