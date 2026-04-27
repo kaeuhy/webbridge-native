@@ -1,10 +1,10 @@
-import type { Interceptor, WebBridgeRequest, WebBridgeResponse } from '@webbridge-native/core';
-import { deleteHeader } from '@webbridge-native/core';
+import type { Interceptor } from '@webbridge-native/core';
+import { deleteHeader, getHeader, generateRequestId } from '@webbridge-native/core';
 
 const MAX_REDIRECTS = 5;
 
 const REDIRECT_STATUS = new Set([301, 302, 303, 307, 308]);
-/** 301/302/303 → method를 GET으로 변경, body 제거 */
+/** 301/302/303 → method를 GET으로 변경, body 제거 (브라우저 동작 준수) */
 const METHOD_CHANGE_STATUS = new Set([301, 302, 303]);
 
 /**
@@ -27,7 +27,6 @@ export function redirectInterceptor(): Interceptor {
             `Redirect response (${response.status}) received with redirect mode "error"`,
           );
         }
-        // manual: 그대로 반환
         return response;
       }
       return response;
@@ -71,46 +70,39 @@ export function redirectInterceptor(): Interceptor {
       }
 
       if (METHOD_CHANGE_STATUS.has(response.status)) {
-        // 301/302/303 → GET, no body
         currentRequest = {
           ...currentRequest,
           url: redirectUrl,
           method: 'GET',
           body: null,
           headers,
+          id: generateRequestId(),
         };
       } else {
-        // 307/308 → preserve method and body
         currentRequest = {
           ...currentRequest,
           url: redirectUrl,
           headers,
+          id: generateRequestId(),
         };
       }
     }
   };
 }
 
-function getHeader(headers: Record<string, string>, name: string): string | undefined {
-  for (const [key, value] of Object.entries(headers)) {
-    if (key.toLowerCase() === name.toLowerCase()) return value;
-  }
-  return undefined;
-}
-
 function resolveUrl(location: string, base: string): string {
   try {
     return new URL(location, base).href;
   } catch {
-    return location;
+    throw new TypeError(
+      `Invalid redirect Location: "${location}" (base: "${base}")`,
+    );
   }
 }
 
 function isCrossOrigin(url1: string, url2: string): boolean {
   try {
-    const a = new URL(url1);
-    const b = new URL(url2);
-    return a.origin !== b.origin;
+    return new URL(url1).origin !== new URL(url2).origin;
   } catch {
     return true;
   }

@@ -18,6 +18,8 @@ export interface WebBridgeOptions {
   mock?: { handlers: RequestHandler[] } | false;
   /** 추가 인터셉터 */
   interceptors?: Interceptor[];
+  /** true면 기본 terminal interceptor(globalThis.fetch)를 추가하지 않는다. 직접 terminal을 등록해야 한다. */
+  skipDefaultTerminal?: boolean;
 }
 
 export interface WebBridgeInstance {
@@ -81,16 +83,14 @@ export function setupWebBridge(options?: WebBridgeOptions): WebBridgeInstance {
     }
   }
 
-  // Terminal interceptor — 체인의 마지막. native-bridge가 없으면 글로벌 fetch 사용.
-  // native-bridge가 있으면 사용자가 interceptors에 포함시켜야 함.
-  const hasTerminal = opts.interceptors?.some(() => true) ?? false;
-  if (!hasTerminal) {
+  // Terminal interceptor — 체인의 마지막.
+  // skipDefaultTerminal: true로 설정하면 사용자가 직접 terminal을 추가해야 함.
+  if (!opts.skipDefaultTerminal) {
     client.use(async (request) => {
-      // Fallback: 글로벌 fetch 사용 (RN 환경 기본)
       const res = await globalThis.fetch(request.url, {
         method: request.method,
         headers: request.headers,
-        body: request.body as BodyInit | undefined,
+        body: request.body ?? undefined,
         signal: request.signal,
       });
       const body = await res.text();

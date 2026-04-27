@@ -39,6 +39,7 @@ export class EventSource {
 
   readonly url: string;
   readonly withCredentials: boolean;
+  private readonly origin: string;
 
   readyState: number = EventSource.CONNECTING;
 
@@ -55,6 +56,10 @@ export class EventSource {
     this.url = url;
     this.withCredentials = options?.withCredentials ?? false;
     this.headers = options?.headers ? { ...options.headers } : {};
+
+    let parsedOrigin = '';
+    try { parsedOrigin = new URL(url).origin; } catch { /* invalid URL */ }
+    this.origin = parsedOrigin;
 
     // TODO: 실제 연결은 RN 환경에서 native-bridge 또는 fetch 스트리밍으로 구현
     // this.connect();
@@ -80,6 +85,7 @@ export class EventSource {
     const handlers = this.listeners.get(type);
     if (handlers) {
       handlers.delete(handler);
+      if (handlers.size === 0) this.listeners.delete(type);
     }
   }
 
@@ -104,7 +110,7 @@ export class EventSource {
         type: event.type,
         data: event.data,
         lastEventId: this.lastEventId,
-        origin: new URL(this.url).origin,
+        origin: this.origin,
       };
 
       // 'message' 이벤트는 onmessage 핸들러로

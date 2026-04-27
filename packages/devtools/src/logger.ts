@@ -43,10 +43,10 @@ export class RequestLogger {
       url: request.url,
       method: request.method,
       requestHeaders: { ...request.headers },
-      requestBody: this.truncateBody(typeof request.body === 'string' ? request.body : null),
+      requestBody: this.truncateBody(this.bodyToString(request.body)),
       status: response.status,
       responseHeaders: { ...response.headers },
-      responseBody: this.truncateBody(typeof response.body === 'string' ? response.body : null),
+      responseBody: this.truncateBody(this.bodyToString(response.body)),
       startTime,
       endTime,
       duration: endTime - startTime,
@@ -77,6 +77,13 @@ export class RequestLogger {
   /** 기록 수를 반환한다. */
   get size(): number {
     return this.entries.length;
+  }
+
+  private bodyToString(body: string | ArrayBuffer | null | undefined): string | null {
+    if (body === null || body === undefined) return null;
+    if (typeof body === 'string') return body;
+    if (body instanceof ArrayBuffer) return `[ArrayBuffer, ${body.byteLength} bytes]`;
+    return null;
   }
 
   private truncateBody(body: string | null): string | null {

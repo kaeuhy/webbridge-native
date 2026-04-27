@@ -53,20 +53,26 @@ export function createAxiosAdapter(client: WebBridgeClient): AxiosAdapter {
 
     // AbortSignal: config.signal 또는 config.timeout 기반
     let signal: AbortSignal | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     if (config.signal instanceof AbortSignal) {
       signal = config.signal;
     } else if (config.timeout && config.timeout > 0) {
       const controller = new AbortController();
-      setTimeout(() => controller.abort(), config.timeout);
+      timeoutId = setTimeout(() => controller.abort(), config.timeout);
       signal = controller.signal;
     }
 
-    const response = await client.fetch(url, {
-      method,
-      headers,
-      body,
-      signal,
-    });
+    let response;
+    try {
+      response = await client.fetch(url, {
+        method,
+        headers,
+        body,
+        signal,
+      });
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    }
 
     // Parse response data
     let data: unknown = response.body;

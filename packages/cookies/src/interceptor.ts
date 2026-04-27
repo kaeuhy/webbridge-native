@@ -83,7 +83,7 @@ function splitSetCookieString(header: string): string[] {
       // 콤마 뒤의 내용이 새 쿠키 시작인지 확인
       // 새 쿠키: "name=" 패턴 (공백 건너뛰고 알파벳+등호)
       const rest = header.slice(i + 1).trimStart();
-      if (/^[a-zA-Z0-9_-]+=/.test(rest)) {
+      if (/^[^\s;,=]+=/.test(rest)) {
         cookies.push(current.trim());
         current = '';
         i++;

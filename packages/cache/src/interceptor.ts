@@ -1,5 +1,7 @@
 import type { Interceptor } from '@webbridge-native/core';
 import { getHeader } from '@webbridge-native/core';
+
+const textEncoder = new TextEncoder();
 import { HttpCache } from './store';
 import { parseCacheControl, isCacheable } from './cache-control';
 
@@ -86,7 +88,7 @@ function storeIfCacheable(
   if (varyValue === '*') return;
 
   const bodySize = typeof response.body === 'string'
-    ? new TextEncoder().encode(response.body).byteLength
+    ? textEncoder.encode(response.body).byteLength
     : response.body instanceof ArrayBuffer
       ? response.body.byteLength
       : 0;

@@ -79,12 +79,12 @@ export class CookieJar {
       return a.creationTime - b.creationTime;
     });
 
-    // lastAccessTime 갱신
-    for (const cookie of matched) {
-      cookie.lastAccessTime = now;
-    }
-
-    return matched;
+    // lastAccessTime 갱신 — clone하여 반환 (store 내부 객체 직접 수정 방지)
+    return matched.map((cookie) => {
+      const updated = { ...cookie, lastAccessTime: now };
+      this.store.set(updated); // store에도 반영
+      return updated;
+    });
   }
 
   /**

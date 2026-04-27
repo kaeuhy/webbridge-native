@@ -1,4 +1,4 @@
-import type { Interceptor, WebBridgeResponse } from '@webbridge-native/core';
+import type { Interceptor, WebBridgeRequest, WebBridgeResponse } from '@webbridge-native/core';
 import { createResponse } from '@webbridge-native/core';
 import type { RequestHandler } from './handler';
 import { findHandler } from './handler';
@@ -98,7 +98,7 @@ export class MockServer {
   }
 
   private async handleUnmatched(
-    request: { url: string; method: string },
+    request: WebBridgeRequest,
     next: Parameters<Interceptor>[1],
   ): Promise<WebBridgeResponse> {
     switch (this.onUnhandledRequest) {
@@ -107,13 +107,13 @@ export class MockServer {
           `[WebBridge Mock] Unhandled ${request.method} ${request.url}`,
         );
       case 'bypass':
-        return next(request as Parameters<typeof next>[0]);
+        return next(request);
       case 'warn':
       default:
         console.warn(
           `[WebBridge Mock] Warning: unhandled ${request.method} ${request.url}`,
         );
-        return next(request as Parameters<typeof next>[0]);
+        return next(request);
     }
   }
 }

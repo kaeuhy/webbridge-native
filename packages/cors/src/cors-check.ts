@@ -1,3 +1,5 @@
+import { getHeader } from '@webbridge-native/core';
+
 /** CORS 검사 결과 */
 export interface CorsCheckResult {
   allowed: boolean;
@@ -105,9 +107,3 @@ export function checkCorsHeaders(
   return { allowed: true };
 }
 
-function getHeader(headers: Record<string, string>, name: string): string | undefined {
-  for (const [key, value] of Object.entries(headers)) {
-    if (key.toLowerCase() === name.toLowerCase()) return value;
-  }
-  return undefined;
-}

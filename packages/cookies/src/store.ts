@@ -123,10 +123,14 @@ export class CookieStore {
       (a, b) => a.lastAccessTime - b.lastAccessTime,
     );
     const toRemove = all.length - MAX_COOKIES_TOTAL;
-    const removeSet = new Set(all.slice(0, toRemove));
+    const removeKeys = new Set(
+      all.slice(0, toRemove).map((c) => `${c.name}\0${c.domain}\0${c.path}`),
+    );
 
     for (const [domain, list] of this.cookies.entries()) {
-      const filtered = list.filter((c) => !removeSet.has(c));
+      const filtered = list.filter(
+        (c) => !removeKeys.has(`${c.name}\0${c.domain}\0${c.path}`),
+      );
       if (filtered.length === 0) {
         this.cookies.delete(domain);
       } else {

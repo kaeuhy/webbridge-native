@@ -73,23 +73,6 @@ export class HttpCache {
     return null;
   }
 
-  /** @deprecated 이전 호환. get()으로 대체됨. */
-  private _getLegacy(url: string, varyHeaders?: Record<string, string>): CacheEntry | null {
-    const key = this.buildKey(url, varyHeaders);
-    const entry = this.cache.get(key);
-
-    if (!entry) {
-      this.misses++;
-      return null;
-    }
-
-    this.cache.delete(key);
-    this.cache.set(key, entry);
-
-    this.hits++;
-    return entry;
-  }
-
   /** 응답을 캐시에 저장한다. */
   set(
     url: string,
@@ -174,7 +157,7 @@ export class HttpCache {
     const sorted = Object.entries(varyHeaders).sort(([a], [b]) =>
       a.localeCompare(b),
     );
-    return sorted.map(([k, v]) => `${k}=${v}`).join('&');
+    return sorted.map(([k, v]) => `${k.toLowerCase()}=${v}`).join('&');
   }
 
   /** vary 필드 이름과 요청 헤더로부터 vary key를 생성한다. */
