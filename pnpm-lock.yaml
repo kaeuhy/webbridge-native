@@ -51,7 +51,11 @@ importers:
 
   packages/core: {}
 
-  packages/cors: {}
+  packages/cors:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/devtools:
     dependencies:
@@ -98,7 +102,11 @@ importers:
         specifier: workspace:*
         version: link:../core
 
-  packages/sse: {}
+  packages/sse:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
 packages:
 
