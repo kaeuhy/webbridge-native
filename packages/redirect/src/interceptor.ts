@@ -1,4 +1,5 @@
 import type { Interceptor, WebBridgeRequest, WebBridgeResponse } from '@webbridge-native/core';
+import { deleteHeader } from '@webbridge-native/core';
 
 const MAX_REDIRECTS = 5;
 
@@ -61,11 +62,12 @@ export function redirectInterceptor(): Interceptor {
 
       const redirectUrl = resolveUrl(location, currentRequest.url);
 
-      // Cross-origin Authorization strip
-      const headers = { ...currentRequest.headers };
+      // Cross-origin 시 민감 헤더 제거 (브라우저 동작 준수)
+      let headers = { ...currentRequest.headers };
       if (isCrossOrigin(currentRequest.url, redirectUrl)) {
-        delete headers['Authorization'];
-        delete headers['authorization'];
+        headers = deleteHeader(headers, 'Authorization');
+        headers = deleteHeader(headers, 'Cookie');
+        headers = deleteHeader(headers, 'Proxy-Authorization');
       }
 
       if (METHOD_CHANGE_STATUS.has(response.status)) {

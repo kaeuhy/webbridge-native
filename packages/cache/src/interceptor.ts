@@ -1,4 +1,5 @@
 import type { Interceptor } from '@webbridge-native/core';
+import { getHeader } from '@webbridge-native/core';
 import { HttpCache } from './store';
 import { parseCacheControl, isCacheable } from './cache-control';
 
@@ -41,8 +42,14 @@ export function cacheInterceptor(options: CacheInterceptorOptions): Interceptor 
 
       const response = await next({ ...request, headers: conditionalHeaders });
 
-      // 304 → 캐시된 body 재사용
+      // 304 → 캐시된 body 재사용 + storedAt 갱신
       if (response.status === 304) {
+        const directives = parseCacheControl(getHeader(response.headers, 'cache-control'));
+        cache.set(
+          request.url,
+          { ...entry, storedAt: Date.now(), maxAge: directives.maxAge ?? entry.maxAge },
+          extractVaryHeaders(request.headers, getHeader(response.headers, 'vary')),
+        );
         return {
           ...entry.response,
           headers: { ...entry.response.headers, ...response.headers, 'X-Cache': 'REVALIDATED' },
@@ -66,12 +73,16 @@ function storeIfCacheable(
   request: { method: string; url: string; headers: Record<string, string> },
   response: { status: number; headers: Record<string, string>; body: string | ArrayBuffer | null },
 ): void {
-  const directives = parseCacheControl(response.headers['Cache-Control'] || response.headers['cache-control']);
+  const directives = parseCacheControl(getHeader(response.headers, 'cache-control'));
 
   if (!isCacheable(request.method, response.status, directives)) return;
 
+  // Vary: * 는 캐시 불가 (RFC 7234 §4.1)
+  const varyValue = getHeader(response.headers, 'vary');
+  if (varyValue === '*') return;
+
   const bodySize = typeof response.body === 'string'
-    ? response.body.length
+    ? new TextEncoder().encode(response.body).byteLength
     : response.body instanceof ArrayBuffer
       ? response.body.byteLength
       : 0;
@@ -91,13 +102,13 @@ function storeIfCacheable(
       },
       storedAt: Date.now(),
       maxAge: directives.maxAge ?? 0,
-      etag: response.headers['ETag'] || response.headers['etag'],
-      lastModified: response.headers['Last-Modified'] || response.headers['last-modified'],
+      etag: getHeader(response.headers, 'etag'),
+      lastModified: getHeader(response.headers, 'last-modified'),
       size: bodySize,
       staleWhileRevalidate: directives.staleWhileRevalidate,
       staleIfError: directives.staleIfError,
     },
-    extractVaryHeaders(request.headers, response.headers['Vary'] || response.headers['vary']),
+    extractVaryHeaders(request.headers, varyValue),
   );
 }
 

@@ -1,4 +1,5 @@
 import type { Cookie } from './cookie';
+import { domainMatch } from './matching';
 
 /**
  * Set-Cookie 헤더 문자열을 파싱하여 Cookie 객체를 반환한다.
@@ -38,6 +39,11 @@ export function parseSetCookie(
   // Domain 처리 (RFC 6265 §5.2.3)
   let domain = attrs.domain ?? url.hostname;
   domain = domain.replace(/^\./, '').toLowerCase();
+
+  // RFC 6265 §5.3 step 5: domain이 요청 호스트와 매칭되지 않으면 거부
+  if (attrs.domain !== undefined && !domainMatch(domain, url.hostname)) {
+    return null;
+  }
 
   // Path 처리 (RFC 6265 §5.2.4)
   const path = attrs.path ?? defaultPath(url.pathname);

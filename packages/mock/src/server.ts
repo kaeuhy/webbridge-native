@@ -46,11 +46,14 @@ export class MockServer {
     this.runtimeHandlers = [];
   }
 
-  /** 런타임 핸들러를 제거하고 초기 핸들러만 남긴다. */
+  /**
+   * 런타임 핸들러를 제거한다.
+   * 인자가 있으면 초기 핸들러를 교체한다 (MSW v2 호환).
+   */
   resetHandlers(...newHandlers: RequestHandler[]): void {
     this.runtimeHandlers = [];
     if (newHandlers.length > 0) {
-      this.initialHandlers = [...newHandlers];
+      this.initialHandlers = newHandlers;
     }
   }
 

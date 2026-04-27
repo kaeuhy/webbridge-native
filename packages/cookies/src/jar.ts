@@ -113,6 +113,14 @@ export class CookieJar {
     return this.store;
   }
 
+  /** 리소스 정리 (타이머 해제). */
+  dispose(): void {
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+  }
+
   private schedulePersist(): void {
     if (!this.persistent) return;
     if (this.flushTimer) clearTimeout(this.flushTimer);

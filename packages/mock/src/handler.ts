@@ -83,7 +83,7 @@ export function findHandler(
   request: WebBridgeRequest,
 ): { handler: RequestHandler; params: Record<string, string> } | null {
   for (const handler of handlers) {
-    if (handler.method !== request.method) continue;
+    if (handler.method.toUpperCase() !== request.method.toUpperCase()) continue;
     const params = matchUrl(handler.pattern, request.url);
     if (params !== null) {
       return { handler, params };

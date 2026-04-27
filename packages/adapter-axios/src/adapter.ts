@@ -1,4 +1,5 @@
 import type { WebBridgeClient } from '@webbridge-native/core';
+import { getHeader } from '@webbridge-native/core';
 import type {
   AxiosAdapter,
   InternalAxiosRequestConfig,
@@ -58,7 +59,7 @@ export function createAxiosAdapter(client: WebBridgeClient): AxiosAdapter {
     // Parse response data
     let data: unknown = response.body;
     if (typeof response.body === 'string') {
-      const contentType = response.headers['content-type'] || response.headers['Content-Type'] || '';
+      const contentType = getHeader(response.headers, 'content-type') ?? '';
       if (contentType.includes('application/json')) {
         try {
           data = JSON.parse(response.body);
@@ -83,11 +84,28 @@ function buildUrl(config: InternalAxiosRequestConfig): string {
   const baseURL = config.baseURL ?? '';
   const url = config.url ?? '';
 
+  let fullUrl: string;
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
+    fullUrl = url;
+  } else {
+    const base = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+    const path = url.startsWith('/') ? url : `/${url}`;
+    fullUrl = `${base}${path}`;
   }
 
-  const base = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
-  const path = url.startsWith('/') ? url : `/${url}`;
-  return `${base}${path}`;
+  // Append query params
+  if (config.params && typeof config.params === 'object') {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(config.params as Record<string, unknown>)) {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    }
+    const qs = searchParams.toString();
+    if (qs) {
+      fullUrl += (fullUrl.includes('?') ? '&' : '?') + qs;
+    }
+  }
+
+  return fullUrl;
 }

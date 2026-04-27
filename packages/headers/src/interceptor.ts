@@ -1,4 +1,5 @@
 import type { Interceptor } from '@webbridge-native/core';
+import { hasHeader } from '@webbridge-native/core';
 import { buildUserAgent } from './user-agent';
 
 export interface HeaderInterceptorOptions {
@@ -46,24 +47,24 @@ export function headerInterceptor(
 
   const accept = opts.accept !== false ? DEFAULT_ACCEPT : null;
 
-  const origin = opts.origin || null;
+  const origin = opts.origin === false ? null : (opts.origin ?? null);
 
   return async (request, next) => {
     const headers = { ...request.headers };
 
-    if (userAgent && !headers['User-Agent']) {
+    if (userAgent && !hasHeader(headers, 'User-Agent')) {
       headers['User-Agent'] = userAgent;
     }
 
-    if (acceptLanguage && !headers['Accept-Language']) {
+    if (acceptLanguage && !hasHeader(headers, 'Accept-Language')) {
       headers['Accept-Language'] = acceptLanguage;
     }
 
-    if (acceptEncoding && !headers['Accept-Encoding']) {
+    if (acceptEncoding && !hasHeader(headers, 'Accept-Encoding')) {
       headers['Accept-Encoding'] = acceptEncoding;
     }
 
-    if (accept && !headers['Accept']) {
+    if (accept && !hasHeader(headers, 'Accept')) {
       headers['Accept'] = accept;
     }
 

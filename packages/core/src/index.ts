@@ -11,3 +11,10 @@ export type {
 export { WebBridgeClient } from './client';
 
 export { createRequest, createResponse, generateRequestId } from './utils';
+
+export {
+  getHeader,
+  hasHeader,
+  setHeaderIfAbsent,
+  deleteHeader,
+} from './headers';

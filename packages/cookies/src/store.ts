@@ -25,13 +25,16 @@ export class CookieStore {
     const existingIndex = list.findIndex(
       (c) => c.name === cookie.name && c.path === cookie.path,
     );
+    // 클론하여 caller의 객체를 변경하지 않음
+    let stored = { ...cookie };
+
     if (existingIndex !== -1) {
       // 기존 쿠키의 creationTime 유지 (RFC 6265 §5.3 step 11)
-      cookie.creationTime = list[existingIndex].creationTime;
+      stored = { ...stored, creationTime: list[existingIndex].creationTime };
       list.splice(existingIndex, 1);
     }
 
-    list.push(cookie);
+    list.push(stored);
 
     // 도메인별 제한 적용 — 오래된 것 먼저 제거
     if (list.length > MAX_COOKIES_PER_DOMAIN) {

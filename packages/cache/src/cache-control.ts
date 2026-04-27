@@ -36,7 +36,7 @@ export function parseCacheControl(header: string | undefined): CacheDirectives {
     switch (key) {
       case 'max-age': {
         const n = parseInt(val, 10);
-        if (!isNaN(n)) result.maxAge = n;
+        if (!isNaN(n) && n >= 0) result.maxAge = n;
         break;
       }
       case 's-maxage': {

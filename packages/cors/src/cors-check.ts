@@ -74,9 +74,11 @@ export function checkCorsHeaders(
     if (!allowMethods) {
       return { allowed: false, reason: `Method "${requestMethod}" not allowed (no Allow-Methods header)` };
     }
-    const methods = allowMethods.split(',').map((m) => m.trim().toUpperCase());
-    if (!methods.includes(requestMethod)) {
-      return { allowed: false, reason: `Method "${requestMethod}" not in allowed methods: ${allowMethods}` };
+    if (allowMethods.trim() !== '*') {
+      const methods = allowMethods.split(',').map((m) => m.trim().toUpperCase());
+      if (!methods.includes(requestMethod)) {
+        return { allowed: false, reason: `Method "${requestMethod}" not in allowed methods: ${allowMethods}` };
+      }
     }
   }
 
@@ -88,6 +90,9 @@ export function checkCorsHeaders(
     const allowHeaders = getHeader(responseHeaders, 'access-control-allow-headers');
     if (!allowHeaders) {
       return { allowed: false, reason: `Headers [${nonSimpleHeaders.join(', ')}] not allowed (no Allow-Headers header)` };
+    }
+    if (allowHeaders.trim() === '*') {
+      return { allowed: true };
     }
     const allowed = allowHeaders.split(',').map((h) => h.trim().toLowerCase());
     for (const header of nonSimpleHeaders) {

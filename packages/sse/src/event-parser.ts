@@ -13,8 +13,10 @@ export interface SSEEvent {
  * @returns 파싱된 이벤트 배열
  */
 export function parseEventStream(chunk: string): SSEEvent[] {
+  // W3C spec: CR, LF, CRLF are all valid line endings
+  const normalized = chunk.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const events: SSEEvent[] = [];
-  const blocks = chunk.split('\n\n');
+  const blocks = normalized.split('\n\n');
 
   for (const block of blocks) {
     if (!block.trim()) continue;
@@ -51,7 +53,10 @@ export function parseEventStream(chunk: string): SSEEvent[] {
           dataLines.push(value);
           break;
         case 'id':
-          lastEventId = value;
+          // W3C spec: if value contains U+0000, ignore the field
+          if (!value.includes('\0')) {
+            lastEventId = value;
+          }
           break;
         case 'retry':
           // retry는 EventSource 레벨에서 처리
@@ -76,7 +81,7 @@ export function parseEventStream(chunk: string): SSEEvent[] {
  * @returns retry 값 (ms) 또는 undefined
  */
 export function parseRetryField(chunk: string): number | undefined {
-  const lines = chunk.split('\n');
+  const lines = chunk.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
   for (const line of lines) {
     if (line.startsWith('retry:')) {
       const value = line.slice(6).trim();

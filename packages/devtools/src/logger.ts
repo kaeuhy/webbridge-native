@@ -103,14 +103,15 @@ export class RequestLogger {
 
   /** curl 명령으로 변환한다. */
   toCurl(entry: RequestLogEntry): string {
+    const esc = (s: string) => s.replace(/'/g, "'\\''");
     const parts = [`curl -X ${entry.method}`];
     for (const [key, value] of Object.entries(entry.requestHeaders)) {
-      parts.push(`-H '${key}: ${value}'`);
+      parts.push(`-H '${esc(key)}: ${esc(value)}'`);
     }
     if (entry.requestBody) {
-      parts.push(`-d '${entry.requestBody}'`);
+      parts.push(`-d '${esc(entry.requestBody)}'`);
     }
-    parts.push(`'${entry.url}'`);
+    parts.push(`'${esc(entry.url)}'`);
     return parts.join(' \\\n  ');
   }
 }
