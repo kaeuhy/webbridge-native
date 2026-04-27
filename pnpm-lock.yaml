@@ -37,7 +37,11 @@ importers:
 
   packages/adapter-react-query: {}
 
-  packages/cache: {}
+  packages/cache:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/cookies:
     dependencies:
@@ -49,7 +53,11 @@ importers:
 
   packages/cors: {}
 
-  packages/devtools: {}
+  packages/devtools:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/headers:
     dependencies:
@@ -84,7 +92,11 @@ importers:
         specifier: workspace:*
         version: link:../mock
 
-  packages/redirect: {}
+  packages/redirect:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/sse: {}
 

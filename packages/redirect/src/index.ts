@@ -1,2 +1,4 @@
 // @webbridge-native/redirect
-export {};
+// Redirect handler for WebBridge Native
+
+export { redirectInterceptor } from './interceptor';
