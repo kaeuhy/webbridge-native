@@ -1,6 +1,6 @@
 import type { Cookie } from './cookie';
 import { parseSetCookie } from './parser';
-import { shouldSendCookie, domainMatch } from './matching';
+import { shouldSendCookie } from './matching';
 import { CookieStore } from './store';
 
 export interface CookieJarOptions {

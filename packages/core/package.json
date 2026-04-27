@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
-    "lint": "echo 'lint placeholder'",
+    "lint": "eslint src --ext .ts --max-warnings 0",
     "test": "jest"
   },
   "license": "MIT",

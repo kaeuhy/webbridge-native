@@ -9,3 +9,5 @@ export type { CookieInterceptorOptions } from './interceptor';
 export { parseSetCookie } from './parser';
 export { domainMatch, pathMatch, shouldSendCookie } from './matching';
 export { isPublicSuffix } from './public-suffix';
+export { PersistentCookieStore } from './persistent-store';
+export type { PersistenceAdapter } from './persistent-store';

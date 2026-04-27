@@ -1,5 +1,4 @@
 import type { Interceptor, WebBridgeRequest, WebBridgeResponse } from '@webbridge-native/core';
-import { createResponse } from '@webbridge-native/core';
 import type { RequestHandler } from './handler';
 import { findHandler } from './handler';
 
