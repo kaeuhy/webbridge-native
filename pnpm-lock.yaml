@@ -51,7 +51,11 @@ importers:
 
   packages/devtools: {}
 
-  packages/headers: {}
+  packages/headers:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/mock: {}
 
