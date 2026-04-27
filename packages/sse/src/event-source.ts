@@ -71,6 +71,10 @@ export class EventSource {
   private connect(): void {
     if (this.readyState === EventSource.CLOSED) return;
 
+    // 이전 연결이 있으면 abort하여 좀비 방지
+    if (this.abortController) {
+      this.abortController.abort();
+    }
     this.abortController = new AbortController();
 
     const fetchHeaders: Record<string, string> = {
