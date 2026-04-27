@@ -9,7 +9,15 @@
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint placeholder'",
-    "test": "echo 'test placeholder'"
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "codegenConfig": {
+    "name": "WebBridgeNativeSpec",
+    "type": "modules",
+    "jsSrcsDir": "./src"
   },
   "license": "MIT",
   "publishConfig": {

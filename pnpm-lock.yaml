@@ -63,7 +63,11 @@ importers:
         specifier: workspace:*
         version: link:../core
 
-  packages/native-bridge: {}
+  packages/native-bridge:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/preset:
     dependencies:
