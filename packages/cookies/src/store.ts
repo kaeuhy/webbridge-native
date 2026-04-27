@@ -75,6 +75,17 @@ export class CookieStore {
     }
   }
 
+  /** 특정 쿠키를 name+domain+path로 삭제한다. */
+  remove(name: string, domain: string, path: string): boolean {
+    const list = this.cookies.get(domain);
+    if (!list) return false;
+    const idx = list.findIndex((c) => c.name === name && c.path === path);
+    if (idx === -1) return false;
+    list.splice(idx, 1);
+    if (list.length === 0) this.cookies.delete(domain);
+    return true;
+  }
+
   /** 특정 도메인 또는 전체 쿠키를 삭제한다. */
   clear(domain?: string): void {
     if (domain) {

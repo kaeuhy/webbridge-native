@@ -40,9 +40,9 @@ export class CookieJar {
     const cookie = parseSetCookie(header, url);
     if (!cookie) return;
 
-    // 만료된 쿠키면 제거 목적
+    // 만료된 쿠키면 해당 쿠키만 삭제 (Max-Age=0 등)
     if (cookie.expires !== undefined && cookie.expires <= Date.now()) {
-      this.store.removeExpired();
+      this.store.remove(cookie.name, cookie.domain, cookie.path);
       this.schedulePersist();
       return;
     }
@@ -79,12 +79,23 @@ export class CookieJar {
       return a.creationTime - b.creationTime;
     });
 
-    // lastAccessTime 갱신 — clone하여 반환 (store 내부 객체 직접 수정 방지)
-    return matched.map((cookie) => {
+    // lastAccessTime 갱신 — store에 일괄 반영
+    const result: Cookie[] = [];
+    for (const cookie of matched) {
       const updated = { ...cookie, lastAccessTime: now };
-      this.store.set(updated); // store에도 반영
-      return updated;
-    });
+      result.push(updated);
+    }
+    // 일괄 업데이트 (매번 enforceGlobalLimit 호출 방지)
+    for (const cookie of result) {
+      const domain = cookie.domain;
+      const list = this.store.getByDomain(domain);
+      const idx = list.findIndex((c) => c.name === cookie.name && c.path === cookie.path);
+      if (idx !== -1) {
+        list[idx] = cookie;
+      }
+    }
+
+    return result;
   }
 
   /**

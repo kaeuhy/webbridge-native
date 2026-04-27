@@ -1,9 +1,9 @@
 import type { Interceptor } from '@webbridge-native/core';
 import { getHeader } from '@webbridge-native/core';
-
-const textEncoder = new TextEncoder();
 import { HttpCache } from './store';
 import { parseCacheControl, isCacheable } from './cache-control';
+
+const textEncoder = new TextEncoder();
 
 export interface CacheInterceptorOptions {
   /** 사용할 HttpCache 인스턴스 */
