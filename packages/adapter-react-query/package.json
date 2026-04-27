@@ -9,7 +9,16 @@
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint placeholder'",
-    "test": "echo 'test placeholder'"
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": { "optional": false }
   },
   "license": "MIT",
   "publishConfig": {

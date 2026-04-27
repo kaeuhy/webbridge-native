@@ -1,2 +1,4 @@
 // @webbridge-native/adapter-axios
-export {};
+// Axios adapter for WebBridge Native
+
+export { createAxiosAdapter } from './adapter';
