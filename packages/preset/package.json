@@ -9,7 +9,13 @@
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint placeholder'",
-    "test": "echo 'test placeholder'"
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*",
+    "@webbridge-native/cookies": "workspace:*",
+    "@webbridge-native/headers": "workspace:*",
+    "@webbridge-native/mock": "workspace:*"
   },
   "license": "MIT",
   "publishConfig": {

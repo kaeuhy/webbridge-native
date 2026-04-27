@@ -2,7 +2,19 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "@webbridge-native/core": ["../core/src"],
+      "@webbridge-native/cookies": ["../cookies/src"],
+      "@webbridge-native/headers": ["../headers/src"],
+      "@webbridge-native/mock": ["../mock/src"]
+    }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../cookies" },
+    { "path": "../headers" },
+    { "path": "../mock" }
+  ]
 }

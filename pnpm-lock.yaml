@@ -65,7 +65,20 @@ importers:
 
   packages/native-bridge: {}
 
-  packages/preset: {}
+  packages/preset:
+    dependencies:
+      '@webbridge-native/cookies':
+        specifier: workspace:*
+        version: link:../cookies
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
+      '@webbridge-native/headers':
+        specifier: workspace:*
+        version: link:../headers
+      '@webbridge-native/mock':
+        specifier: workspace:*
+        version: link:../mock
 
   packages/redirect: {}
 
