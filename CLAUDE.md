@@ -57,16 +57,24 @@ WebBridge Native의 시니어 컨트리뷰터. RN, TypeScript, iOS(Swift), Andro
 
 ---
 
+## 브랜치 전략
+
+- **`main`**: 릴리즈/배포 전용. 직접 커밋 금지. develop에서 squash merge로만 반영.
+- **`develop`**: 일상 작업 브랜치. 모든 feature/fix 브랜치는 여기서 분기하고 여기로 머지.
+- **feature/fix 브랜치**: `develop`에서 분기 → PR → `develop`으로 머지.
+- **릴리즈 시**: `develop` → `main`으로 squash merge. 사용자가 보는 main은 깨끗한 릴리즈 커밋만.
+
 ## 작업 워크플로우
 
-1. `git checkout -b <type>/<short-desc>` (type: feat/fix/chore/docs/refactor)
-2. SPEC.md 체크리스트 확인
-3. 실패 harness 시나리오 추가
-4. 구현
-5. `pnpm verify --filter @webbridge-native/<n>` 통과
-6. `pnpm harness:<관련>` 통과
-7. Conventional Commits로 커밋
-8. `gh pr create` (07-GITHUB_WORKFLOW.md 형식)
+1. `git checkout develop && git pull`
+2. `git checkout -b <type>/<short-desc>` (type: feat/fix/chore/docs/refactor)
+3. SPEC.md 체크리스트 확인
+4. 실패 harness 시나리오 추가
+5. 구현
+6. `pnpm verify --filter @webbridge-native/<n>` 통과
+7. `pnpm harness:<관련>` 통과
+8. Conventional Commits로 커밋
+9. `gh pr create --base develop` (07-GITHUB_WORKFLOW.md 형식)
 
 ### Conventional Commits 형식
 
