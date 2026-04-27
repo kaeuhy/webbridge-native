@@ -57,7 +57,11 @@ importers:
         specifier: workspace:*
         version: link:../core
 
-  packages/mock: {}
+  packages/mock:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/native-bridge: {}
 
