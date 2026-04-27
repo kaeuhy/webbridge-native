@@ -1,10 +1,12 @@
 {
   "name": "@webbridge-native/cache",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "HTTP cache (RFC 7234) for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",

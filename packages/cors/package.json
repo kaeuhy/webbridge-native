@@ -1,10 +1,12 @@
 {
   "name": "@webbridge-native/cors",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "CORS simulator for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
