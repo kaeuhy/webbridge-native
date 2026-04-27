@@ -1,0 +1,2 @@
+// @webbridge-native/mock
+export {};

@@ -1,0 +1,2 @@
+// @webbridge-native/sse
+export {};

@@ -1,0 +1,20 @@
+name: "\u2753 Question"
+description: 사용 방법 질문
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Discussions가 질문에 더 적합할 수 있습니다.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 질문
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 시도해본 것
