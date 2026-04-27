@@ -61,13 +61,103 @@ export class EventSource {
     try { parsedOrigin = new URL(url).origin; } catch { /* invalid URL */ }
     this.origin = parsedOrigin;
 
-    // TODO: 실제 연결은 RN 환경에서 native-bridge 또는 fetch 스트리밍으로 구현
-    // this.connect();
+    this.connect();
+  }
+
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private abortController: AbortController | null = null;
+
+  /** 서버에 연결한다. fetch streaming 기반. */
+  private connect(): void {
+    if (this.readyState === EventSource.CLOSED) return;
+
+    this.abortController = new AbortController();
+
+    const fetchHeaders: Record<string, string> = {
+      Accept: 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      ...this.headers,
+    };
+    if (this.lastEventId) {
+      fetchHeaders['Last-Event-ID'] = this.lastEventId;
+    }
+
+    globalThis.fetch(this.url, {
+      headers: fetchHeaders,
+      signal: this.abortController.signal,
+      cache: 'no-store',
+    }).then(async (response) => {
+      if (!response.ok) {
+        this._handleError();
+        this.scheduleReconnect();
+        return;
+      }
+
+      this._handleOpen();
+
+      if (!response.body) {
+        // body stream 미지원 환경 → 전체 text 읽기 (fallback)
+        const text = await response.text();
+        this._handleChunk(text);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (this.readyState === EventSource.CLOSED) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // 완전한 이벤트 블록만 처리 (이중 개행으로 구분)
+        const parts = buffer.split('\n\n');
+        if (parts.length > 1) {
+          // 마지막 부분은 아직 완성되지 않은 버퍼
+          buffer = parts.pop()!;
+          for (const part of parts) {
+            if (part.trim()) {
+              this._handleChunk(part + '\n\n');
+            }
+          }
+        }
+      }
+
+      // 연결 종료 → 재연결
+      if (this.readyState !== EventSource.CLOSED) {
+        this._handleError();
+        this.scheduleReconnect();
+      }
+    }).catch((err) => {
+      if (err.name === 'AbortError') return;
+      if (this.readyState === EventSource.CLOSED) return;
+      this._handleError();
+      this.scheduleReconnect();
+    });
+  }
+
+  private scheduleReconnect(): void {
+    if (this.readyState === EventSource.CLOSED) return;
+    this.reconnectTimer = setTimeout(() => {
+      if (this.readyState === EventSource.CLOSED) return;
+      this.connect();
+    }, this.retryDelay);
   }
 
   /** 연결을 닫는다. */
   close(): void {
     this.readyState = EventSource.CLOSED;
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
   }
 
   /** 이벤트 리스너를 등록한다. */

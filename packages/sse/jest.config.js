@@ -6,4 +6,5 @@ module.exports = {
   moduleNameMapper: {
     '^@webbridge-native/core$': '<rootDir>/../core/src',
   },
+  forceExit: true,
 };

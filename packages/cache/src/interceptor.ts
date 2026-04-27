@@ -37,6 +37,16 @@ export function cacheInterceptor(options: CacheInterceptorOptions): Interceptor 
         return { ...entry.response, headers: { ...entry.response.headers, 'X-Cache': 'HIT' } };
       }
 
+      // stale-while-revalidate: stale 응답 즉시 반환 + 백그라운드 갱신
+      if (cache.isStaleRevalidatable(entry)) {
+        // 백그라운드에서 갱신 (fire-and-forget)
+        next(request).then((freshResponse) => {
+          storeIfCacheable(cache, request, freshResponse);
+        }).catch(() => { /* 백그라운드 갱신 실패는 무시 */ });
+
+        return { ...entry.response, headers: { ...entry.response.headers, 'X-Cache': 'STALE' } };
+      }
+
       // Conditional request 준비
       const conditionalHeaders = { ...request.headers };
       if (entry.etag) {
