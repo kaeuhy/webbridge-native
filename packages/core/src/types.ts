@@ -32,8 +32,14 @@ export interface WebBridgeResponse {
   status: number;
   /** HTTP 상태 텍스트 */
   statusText: string;
-  /** 응답 헤더 */
+  /** 응답 헤더 (단일 값). Set-Cookie 등 다중 값 헤더는 rawHeaders 사용. */
   headers: Record<string, string>;
+  /**
+   * 다중 값 헤더 (Set-Cookie 등).
+   * HTTP는 동일 이름 헤더를 여러 개 허용하지만 Record<string, string>으로는 표현 불가.
+   * 이 필드에 원본 헤더 배열을 저장한다.
+   */
+  rawHeaders?: Record<string, string[]>;
   /** 응답 본문 */
   body: string | ArrayBuffer | null;
   /** 상태 코드 200-299 여부 */

@@ -17,13 +17,17 @@ export function cacheInterceptor(options: CacheInterceptorOptions): Interceptor 
   const { cache } = options;
 
   return async (request, next) => {
-    // GET 요청만 캐시
+    // 비-GET 요청: 캐시 무효화 후 통과 (RFC 7234 §4.4)
     if (request.method !== 'GET') {
-      return next(request);
+      const response = await next(request);
+      if (response.ok) {
+        cache.delete(request.url);
+      }
+      return response;
     }
 
-    // 캐시 lookup
-    const entry = cache.get(request.url, extractVaryHeaders(request.headers));
+    // 캐시 lookup (요청 헤더 전달하여 Vary 매칭)
+    const entry = cache.get(request.url, request.headers);
 
     if (entry) {
       // Fresh → 캐시 응답 반환
@@ -105,6 +109,7 @@ function storeIfCacheable(
       etag: getHeader(response.headers, 'etag'),
       lastModified: getHeader(response.headers, 'last-modified'),
       size: bodySize,
+      varyFields: varyValue ? varyValue.split(',').map((s) => s.trim().toLowerCase()) : undefined,
       staleWhileRevalidate: directives.staleWhileRevalidate,
       staleIfError: directives.staleIfError,
     },

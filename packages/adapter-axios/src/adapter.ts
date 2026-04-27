@@ -11,16 +11,11 @@ import type {
  * Axios adapter — WebBridgeClient를 통해 요청을 처리.
  *
  * axios의 모든 요청이 WebBridge 인터셉터 체인을 거치게 된다.
- * cookies, headers, cache, mock 등 모든 기능이 자동 적용.
  *
  * @example
  * ```typescript
- * import axios from 'axios';
- * import { createAxiosAdapter } from '@webbridge-native/adapter-axios';
- *
- * const client = setupWebBridge({ cookies: true });
  * const api = axios.create({
- *   adapter: createAxiosAdapter(client.client),
+ *   adapter: createAxiosAdapter(client),
  * });
  * ```
  */
@@ -31,7 +26,6 @@ export function createAxiosAdapter(client: WebBridgeClient): AxiosAdapter {
 
     const headers: Record<string, string> = {};
     if (config.headers) {
-      // AxiosHeaders → plain object
       const rawHeaders = config.headers instanceof Object && 'toJSON' in config.headers
         ? (config.headers as AxiosHeaders).toJSON() as Record<string, unknown>
         : config.headers as Record<string, unknown>;
@@ -42,18 +36,36 @@ export function createAxiosAdapter(client: WebBridgeClient): AxiosAdapter {
       }
     }
 
-    let body: string | null = null;
+    // Body 직렬화 — FormData는 지원하지 않음 (명시적 에러)
+    let body: string | undefined;
     if (config.data !== undefined && config.data !== null) {
-      body = typeof config.data === 'string'
-        ? config.data
-        : JSON.stringify(config.data);
+      if (typeof config.data === 'string') {
+        body = config.data;
+      } else if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+        throw new Error(
+          '@webbridge-native/adapter-axios: FormData is not supported. ' +
+            'Serialize the data manually before passing to axios.',
+        );
+      } else {
+        body = JSON.stringify(config.data);
+      }
+    }
+
+    // AbortSignal: config.signal 또는 config.timeout 기반
+    let signal: AbortSignal | undefined;
+    if (config.signal instanceof AbortSignal) {
+      signal = config.signal;
+    } else if (config.timeout && config.timeout > 0) {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), config.timeout);
+      signal = controller.signal;
     }
 
     const response = await client.fetch(url, {
       method,
       headers,
-      body: body ?? undefined,
-      signal: config.signal instanceof AbortSignal ? config.signal : undefined,
+      body,
+      signal,
     });
 
     // Parse response data
@@ -69,14 +81,30 @@ export function createAxiosAdapter(client: WebBridgeClient): AxiosAdapter {
       }
     }
 
-    return {
+    const axiosResponse: AxiosResponse = {
       data,
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
       config,
       request: undefined,
-    } as AxiosResponse;
+    };
+
+    // validateStatus 체크 (기본: 200-299)
+    const validateStatus = config.validateStatus ?? ((s: number) => s >= 200 && s < 300);
+    if (!validateStatus(response.status)) {
+      const error = new Error(`Request failed with status code ${response.status}`) as Error & {
+        response: AxiosResponse;
+        config: InternalAxiosRequestConfig;
+        isAxiosError: boolean;
+      };
+      error.response = axiosResponse;
+      error.config = config;
+      error.isAxiosError = true;
+      throw error;
+    }
+
+    return axiosResponse;
   };
 }
 
@@ -95,13 +123,29 @@ function buildUrl(config: InternalAxiosRequestConfig): string {
 
   // Append query params
   if (config.params && typeof config.params === 'object') {
-    const searchParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(config.params as Record<string, unknown>)) {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, String(value));
+    const serializer = config.paramsSerializer;
+    let qs: string;
+
+    if (typeof serializer === 'function') {
+      qs = serializer(config.params);
+    } else if (serializer && typeof serializer === 'object' && 'serialize' in serializer) {
+      qs = (serializer as { serialize: (p: unknown) => string }).serialize(config.params);
+    } else {
+      const searchParams = new URLSearchParams();
+      for (const [key, value] of Object.entries(config.params as Record<string, unknown>)) {
+        if (value !== undefined && value !== null) {
+          if (Array.isArray(value)) {
+            for (const v of value) {
+              searchParams.append(key, String(v));
+            }
+          } else {
+            searchParams.append(key, String(value));
+          }
+        }
       }
+      qs = searchParams.toString();
     }
-    const qs = searchParams.toString();
+
     if (qs) {
       fullUrl += (fullUrl.includes('?') ? '&' : '?') + qs;
     }

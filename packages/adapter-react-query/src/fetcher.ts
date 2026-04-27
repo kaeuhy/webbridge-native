@@ -32,6 +32,19 @@ export interface WebBridgeFetcher {
   text(url: string, init?: WebBridgeRequestInit): Promise<string>;
 }
 
+/**
+ * React Query queryFn 래퍼 — AbortSignal을 자동 전달한다.
+ *
+ * @example
+ * ```typescript
+ * const fetcher = createFetcher(client);
+ * useQuery({
+ *   queryKey: ['user', id],
+ *   queryFn: ({ signal }) => fetcher.json(`/users/${id}`, { signal }),
+ * });
+ * ```
+ */
+
 export interface CreateFetcherOptions {
   /** 기본 URL 접두사 */
   baseURL?: string;
@@ -78,9 +91,15 @@ export function createFetcher(
         throw new FetchError(response.status, response.statusText, response);
       }
       if (typeof response.body !== 'string') {
-        throw new Error('Response body is not a string');
+        throw new Error(`Response body is not a string (url: ${url})`);
       }
-      return JSON.parse(response.body) as T;
+      try {
+        return JSON.parse(response.body) as T;
+      } catch (e) {
+        throw new Error(
+          `Failed to parse JSON from ${url} (status: ${response.status}): ${e instanceof Error ? e.message : 'unknown'}`,
+        );
+      }
     },
 
     async text(url, init) {

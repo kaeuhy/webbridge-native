@@ -68,7 +68,7 @@ export function headerInterceptor(
       headers['Accept'] = accept;
     }
 
-    if (origin && !headers['Origin']) {
+    if (origin && !hasHeader(headers, 'Origin')) {
       headers['Origin'] = origin;
     }
 

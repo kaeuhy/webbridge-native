@@ -19,12 +19,16 @@ export interface RequestLogEntry {
  * 요청 로거 — 모든 요청/응답을 기록.
  * DevTools UI의 데이터 소스.
  */
+const DEFAULT_MAX_BODY_SIZE = 64 * 1024; // 64KB
+
 export class RequestLogger {
   private entries: RequestLogEntry[] = [];
   private maxEntries: number;
+  private maxBodySize: number;
 
-  constructor(options?: { maxEntries?: number }) {
+  constructor(options?: { maxEntries?: number; maxBodySize?: number }) {
     this.maxEntries = options?.maxEntries ?? 500;
+    this.maxBodySize = options?.maxBodySize ?? DEFAULT_MAX_BODY_SIZE;
   }
 
   /** 요청/응답 쌍을 기록한다. */
@@ -39,10 +43,10 @@ export class RequestLogger {
       url: request.url,
       method: request.method,
       requestHeaders: { ...request.headers },
-      requestBody: typeof request.body === 'string' ? request.body : null,
+      requestBody: this.truncateBody(typeof request.body === 'string' ? request.body : null),
       status: response.status,
       responseHeaders: { ...response.headers },
-      responseBody: typeof response.body === 'string' ? response.body : null,
+      responseBody: this.truncateBody(typeof response.body === 'string' ? response.body : null),
       startTime,
       endTime,
       duration: endTime - startTime,
@@ -73,6 +77,12 @@ export class RequestLogger {
   /** 기록 수를 반환한다. */
   get size(): number {
     return this.entries.length;
+  }
+
+  private truncateBody(body: string | null): string | null {
+    if (body === null) return null;
+    if (body.length <= this.maxBodySize) return body;
+    return body.slice(0, this.maxBodySize) + `... [truncated, ${body.length} bytes total]`;
   }
 
   /** HAR 1.2 형식으로 export한다. */

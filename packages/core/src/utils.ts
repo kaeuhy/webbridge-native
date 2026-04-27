@@ -72,6 +72,7 @@ export function createResponse(
     status,
     statusText: init.statusText ?? STATUS_TEXT[status] ?? '',
     headers: init.headers ? { ...init.headers } : {},
+    rawHeaders: init.rawHeaders,
     body: init.body ?? null,
     ok: isOkStatus(status),
     redirected: init.redirected ?? false,

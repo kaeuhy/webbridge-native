@@ -8,3 +8,4 @@ export { cookieInterceptor } from './interceptor';
 export type { CookieInterceptorOptions } from './interceptor';
 export { parseSetCookie } from './parser';
 export { domainMatch, pathMatch, shouldSendCookie } from './matching';
+export { isPublicSuffix } from './public-suffix';

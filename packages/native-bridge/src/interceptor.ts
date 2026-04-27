@@ -14,13 +14,6 @@ export interface NativeBridgeInterceptorOptions {
  *
  * 요청을 native 네트워크 레이어로 전달하고, 응답을 WebBridgeResponse로 반환한다.
  * next()를 호출하지 않는 terminal interceptor.
- *
- * @example
- * ```typescript
- * client.use(cookieInterceptor);
- * client.use(headerInterceptor);
- * client.use(nativeBridgeInterceptor()); // 마지막
- * ```
  */
 export function nativeBridgeInterceptor(
   options?: NativeBridgeInterceptorOptions,
@@ -36,52 +29,35 @@ export function nativeBridgeInterceptor(
     const nativeModule = getNativeModule();
     const requestJson = serializeRequest(request);
 
-    // 타임아웃 + AbortSignal 경쟁
-    const responseJson = await Promise.race([
-      nativeModule.sendRequest(requestJson),
-      createTimeoutPromise(timeout, request.id),
-      createAbortPromise(request.signal, request.id),
-    ]);
+    // 타이머와 리스너를 추적하여 정리
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+    let abortListener: (() => void) | undefined;
 
-    return deserializeResponse(responseJson, request.url);
-  };
-}
+    try {
+      const responseJson = await Promise.race([
+        nativeModule.sendRequest(requestJson),
+        new Promise<never>((_, reject) => {
+          timerId = setTimeout(() => {
+            try { nativeModule.cancelRequest(request.id); } catch { /* ignore */ }
+            reject(new Error(`Request timeout after ${timeout}ms (id: ${request.id})`));
+          }, timeout);
+        }),
+        ...(request.signal ? [new Promise<never>((_, reject) => {
+          abortListener = () => {
+            try { nativeModule.cancelRequest(request.id); } catch { /* ignore */ }
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          };
+          request.signal!.addEventListener('abort', abortListener, { once: true });
+        })] : []),
+      ]);
 
-function createTimeoutPromise(
-  ms: number,
-  requestId: string,
-): Promise<never> {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      // 타임아웃 시 native에 취소 요청
-      try {
-        getNativeModule().cancelRequest(requestId);
-      } catch {
-        // native 모듈 없으면 무시
+      return deserializeResponse(responseJson, request.url);
+    } finally {
+      // 타이머와 리스너 정리 (누수 방지)
+      if (timerId !== undefined) clearTimeout(timerId);
+      if (abortListener && request.signal) {
+        request.signal.removeEventListener('abort', abortListener);
       }
-      reject(new Error(`Request timeout after ${ms}ms (id: ${requestId})`));
-    }, ms);
-  });
-}
-
-function createAbortPromise(
-  signal: AbortSignal | undefined,
-  requestId: string,
-): Promise<never> {
-  if (!signal) return new Promise(() => {}); // never resolves
-
-  return new Promise((_, reject) => {
-    if (signal.aborted) {
-      reject(new DOMException('The operation was aborted.', 'AbortError'));
-      return;
     }
-    signal.addEventListener('abort', () => {
-      try {
-        getNativeModule().cancelRequest(requestId);
-      } catch {
-        // ignore
-      }
-      reject(new DOMException('The operation was aborted.', 'AbortError'));
-    }, { once: true });
-  });
+  };
 }

@@ -28,12 +28,22 @@ describe('serializeRequest', () => {
     expect(parsed.headers['Content-Type']).toBe('application/json');
   });
 
-  it('sets body to null for non-string body', () => {
+  it('encodes ArrayBuffer body as base64', () => {
     const req = createRequest('https://example.com');
-    (req as { body: ArrayBuffer }).body = new ArrayBuffer(8);
+    const buffer = new ArrayBuffer(4);
+    new Uint8Array(buffer).set([1, 2, 3, 4]);
+    (req as { body: ArrayBuffer }).body = buffer;
     const json = serializeRequest(req);
     const parsed = JSON.parse(json);
-    expect(parsed.body).toBeNull();
+    expect(parsed.body).toBe(btoa(String.fromCharCode(1, 2, 3, 4)));
+    expect(parsed.bodyEncoding).toBe('base64');
+  });
+
+  it('sets bodyEncoding to utf8 for string body', () => {
+    const req = createRequest('https://example.com', { body: 'hello' });
+    const json = serializeRequest(req);
+    const parsed = JSON.parse(json);
+    expect(parsed.bodyEncoding).toBe('utf8');
   });
 });
 

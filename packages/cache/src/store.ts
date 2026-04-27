@@ -8,6 +8,8 @@ export interface CacheEntry {
   etag?: string;
   lastModified?: string;
   varyKey: string;
+  /** Vary 헤더에 지정된 필드 이름들 (lookup 시 사용) */
+  varyFields?: string[];
   size: number;
   staleWhileRevalidate?: number;
   staleIfError?: number;
@@ -44,8 +46,35 @@ export class HttpCache {
     this.maxSize = options?.maxSize ?? 50 * 1024 * 1024;
   }
 
-  /** 캐시에서 응답을 가져온다. */
-  get(url: string, varyHeaders?: Record<string, string>): CacheEntry | null {
+  /**
+   * 캐시에서 응답을 가져온다.
+   * requestHeaders를 전달하면 저장된 Vary 필드에 맞게 매칭한다.
+   */
+  get(url: string, requestHeaders?: Record<string, string>): CacheEntry | null {
+    // URL에 매칭되는 엔트리를 찾고, vary key가 일치하는 것을 반환
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.url !== url) continue;
+
+      // Vary 필드를 기반으로 요청 헤더에서 vary key 생성
+      const varyKey = entry.varyFields
+        ? this.buildVaryKeyFromFields(entry.varyFields, requestHeaders)
+        : '';
+
+      if (entry.varyKey === varyKey) {
+        // LRU: 접근 시 맨 뒤로 이동
+        this.cache.delete(key);
+        this.cache.set(key, entry);
+        this.hits++;
+        return entry;
+      }
+    }
+
+    this.misses++;
+    return null;
+  }
+
+  /** @deprecated 이전 호환. get()으로 대체됨. */
+  private _getLegacy(url: string, varyHeaders?: Record<string, string>): CacheEntry | null {
     const key = this.buildKey(url, varyHeaders);
     const entry = this.cache.get(key);
 
@@ -54,7 +83,6 @@ export class HttpCache {
       return null;
     }
 
-    // LRU: 접근 시 맨 뒤로 이동
     this.cache.delete(key);
     this.cache.set(key, entry);
 
@@ -68,6 +96,9 @@ export class HttpCache {
     entry: Omit<CacheEntry, 'url' | 'varyKey'>,
     varyHeaders?: Record<string, string>,
   ): void {
+    // 단일 엔트리가 maxSize를 초과하면 저장하지 않음
+    if (entry.size > this.maxSize) return;
+
     const key = this.buildKey(url, varyHeaders);
     const varyKey = this.buildVaryKey(varyHeaders);
 
@@ -144,6 +175,26 @@ export class HttpCache {
       a.localeCompare(b),
     );
     return sorted.map(([k, v]) => `${k}=${v}`).join('&');
+  }
+
+  /** vary 필드 이름과 요청 헤더로부터 vary key를 생성한다. */
+  private buildVaryKeyFromFields(
+    fields: string[],
+    requestHeaders?: Record<string, string>,
+  ): string {
+    if (!fields.length || !requestHeaders) return '';
+    const pairs: [string, string][] = [];
+    for (const field of fields) {
+      const lower = field.toLowerCase();
+      for (const [key, value] of Object.entries(requestHeaders)) {
+        if (key.toLowerCase() === lower) {
+          pairs.push([lower, value]);
+          break;
+        }
+      }
+    }
+    pairs.sort(([a], [b]) => a.localeCompare(b));
+    return pairs.map(([k, v]) => `${k}=${v}`).join('&');
   }
 
   private evict(): void {

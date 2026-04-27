@@ -1,5 +1,6 @@
 import type { Cookie } from './cookie';
 import { domainMatch } from './matching';
+import { isPublicSuffix } from './public-suffix';
 
 /**
  * Set-Cookie 헤더 문자열을 파싱하여 Cookie 객체를 반환한다.
@@ -42,6 +43,11 @@ export function parseSetCookie(
 
   // RFC 6265 §5.3 step 5: domain이 요청 호스트와 매칭되지 않으면 거부
   if (attrs.domain !== undefined && !domainMatch(domain, url.hostname)) {
+    return null;
+  }
+
+  // RFC 6265 §5.3 step 5: public suffix에 쿠키 설정 거부 (보안)
+  if (attrs.domain !== undefined && isPublicSuffix(domain)) {
     return null;
   }
 
