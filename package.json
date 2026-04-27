@@ -1,0 +1,32 @@
+{
+  "name": "webbridge-native",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "verify": "turbo run typecheck lint test",
+    "verify:full": "pnpm verify && pnpm harness:all",
+    "harness:wpt": "node harness/wpt-runner/run.js",
+    "harness:compare": "node harness/browser-comparator/run.js",
+    "harness:e2e": "node harness/e2e-scenarios/run.js",
+    "harness:perf": "node harness/perf-bench/run.js",
+    "harness:all": "pnpm harness:wpt && pnpm harness:compare && pnpm harness:e2e",
+    "poc:devtools-visibility": "node scripts/poc-devtools-visibility.js"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@tanstack/react-query": "^5.100.5",
+    "@types/jest": "^30.0.0",
+    "axios": "^1.15.2",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9",
+    "turbo": "^2.3.0",
+    "typescript": "~5.4.5"
+  }
+}

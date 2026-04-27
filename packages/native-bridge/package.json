@@ -1,0 +1,26 @@
+{
+  "name": "@webbridge-native/native-bridge",
+  "version": "0.0.0",
+  "description": "iOS/Android native modules for WebBridge Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'lint placeholder'",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "codegenConfig": {
+    "name": "WebBridgeNativeSpec",
+    "type": "modules",
+    "jsSrcsDir": "./src"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

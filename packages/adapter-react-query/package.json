@@ -1,0 +1,27 @@
+{
+  "name": "@webbridge-native/adapter-react-query",
+  "version": "0.0.0",
+  "description": "React Query integration for WebBridge Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'lint placeholder'",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": { "optional": false }
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
