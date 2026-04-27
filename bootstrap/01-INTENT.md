@@ -68,6 +68,52 @@ Dev 전용 기능(DevTools 패널, CORS 시뮬레이터 등)은 프로덕션 빌
 
 ---
 
+## 기존 솔루션과 비교
+
+2025년 현재, RN 네트워킹 영역에는 **각각 한 조각만 푸는** 부분 솔루션들이 존재한다. 통합하는 곳은 없다.
+
+| 솔루션 | 푸는 문제 | 안 푸는 문제 |
+|---|---|---|
+| MSW (`msw/native`) | RN에서 MSW DSL 사용 가능 | RN DevTools에 mock 안 보임. 시맨틱 통합 없음 |
+| Radon IDE Network Inspector | iOS NSURLSession 스위즐, Android fetch/XHR 캡처 | IDE 종속. 라이브러리 아님. mock/cookies/cache 미제공 |
+| `@react-native-cookies/cookies` | 쿠키 단순 get/set | 자동 관리 없음. RFC 6265 미준수. SameSite 미처리 |
+| `react-native-nitro-cookies` | Nitro Modules 기반 동기 쿠키 API | 여전히 수동 관리. 자동 첨부/파싱 없음 |
+| `fetch-cookie` | Node.js 환경 쿠키 자동 첨부 | RN 비호환 가능. 영속화/SameSite 부재 |
+| `react-native-network-logger` | 네트워크 요청 인스펙션 | 인스펙터만. mock 없음. 시맨틱 보강 없음 |
+| `@react-native-community/fetch` | 스트리밍 fetch 폴리필 | CORS/cookie 한계를 인정만 함. 해결 안 함 |
+| RN 본가 0.81+ DevTools | fetch/XHR 자동 기록 시작 | mock 가시성 미보장. 시맨틱 통합 없음. 외부 라이브러리 우회 가능 |
+
+**WebBridge Native의 통합 가치**: cookies + cache + redirect + headers + CORS 시맨틱을 한 곳에서 브라우저 표준 준수로 제공하면서, MSW 호환 mock과 native 가시성까지 결합하는 라이브러리는 현재 존재하지 않는다.
+
+---
+
+## 환경 변화 추적 의무
+
+### RN 본가의 Network DevTools 진화
+
+- RN 0.76 (2024.10): React Native DevTools 출시. Network 패널 미포함.
+- RN 0.81+ (2025): fetch, XMLHttpRequest, `<Image>` 네트워크 요청 자동 기록 시작.
+- 단, RN 본가 인스펙터의 인터셉트 위치는 **fetch/XHR JS 레벨**이며, 외부 네트워킹 라이브러리/폴리필이 이를 우회할 수 있다고 공식 문서에 명시됨.
+- RN 본가가 cookie 기반 인증에 대해 **"currently unstable"** 이라고 공식 인정. iOS 302 리다이렉트 시 Set-Cookie 처리 부정확.
+
+### 우리 가치의 시간축 시나리오
+
+1. **현재**: native-bridge의 DevTools 가시성 + 시맨틱 통합이 모두 가치.
+2. **RN 본가가 mock 가시성 흡수 시**: native-bridge의 단순 가시성 가치 약화 → 무게중심을 **시맨틱 통합 패키지**(cookies/cache/redirect)로 이동. 이 영역은 RN 본가가 절대 흡수 못 함.
+3. **장기**: 브라우저 시맨틱 호환 자체가 핵심 가치. DevTools 가시성은 부가 가치로 전환.
+
+### 분기별 환경 재평가
+
+매 분기 `/daily-checkup` 또는 별도 명령으로 다음을 점검한다:
+- RN 신버전의 Network DevTools 변경 사항
+- MSW 메이저 변경
+- 새 경쟁자 등장 여부
+- 우리 차별점 유효성 재확인
+
+결과는 `docs/COMPETITIVE_LANDSCAPE.md`에 누적하여 추적한다.
+
+---
+
 ## 비-목표 (이건 우리가 하지 않는다)
 
 - GraphQL 클라이언트 구현 (Apollo/urql 등이 우리 위에서 동작하면 됨)

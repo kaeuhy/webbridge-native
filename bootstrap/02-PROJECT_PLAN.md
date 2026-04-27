@@ -352,6 +352,9 @@ W3C EventSource spec 준수. 자동 재연결, last-event-id.
 | WPT 호환률 저조 | 중간 | 정직 공개, 미달 사유 문서화 |
 | 메인테이너 burnout | 높음 | Tier 1 후 피드백 단계 의무 |
 | MSW v3 breaking | 중간 | adapter 패턴 격리, sync-upstream으로 자동 감지 |
+| RN 본가가 mock 가시성 흡수 | 매우 높음 | native-bridge 가치 재평가, 무게중심을 cookies/cache 시맨틱으로 이동 |
+| MSW v2 → v3 메이저 변경 | 중간 | adapter 패턴으로 격리, sync-upstream 자동 감지 |
+| Radon IDE 같은 IDE 통합 솔루션 확산 | 낮음 | 우리는 라이브러리라는 차별점 유지, IDE 비종속 |
 
 ## 성공 정의 (1년)
 - Tier 1, 2 완성, v0.5.0 릴리즈

@@ -213,11 +213,30 @@ Metro 플러그인, dev/prod 분기 (Babel plugin), Jest 핸들러 공유.
 
 ## 검증해야 할 핵심 가정 (PoC 우선)
 
-1. **OkHttp Network Interceptor short-circuit → RN DevTools 표시?**
-2. **iOS NSURLProtocol → RN DevTools 표시?**
+### PoC-A: 현재 환경 베이스라인 (가장 먼저, 1일)
+
+목표: RN 최신 안정 버전 + `msw/native`에서 mock 응답이 RN DevTools Network 탭에 보이는지 단순 확인.
+
+결과별 분기:
+- **A-1. 보임** → native-bridge의 차별점이 "단순 가시성"에서 "RN 본가가 안 잡는 영역"으로 이동
+  (예: 커스텀 네이티브 모듈, 서드파티 HTTP 라이브러리, 시맨틱 보강 후 합성한 응답)
+  → 무게중심을 시맨틱 통합 패키지(cookies/cache)로 이동
+- **A-2. 안 보임** → 기존 가설 유지, native-bridge가 그대로 핵심
+
+### PoC-B: 시맨틱 통합 PoC (PoC-A 결과 무관 진행)
+
+목표: cookies 자동 관리 + 캐시 첨부가 한 fetch 호출에서 일관 동작하는지.
+- 작은 시나리오: 로그인 → Set-Cookie 자동 저장 → 다음 요청에 Cookie 자동 첨부 → 서버 캐시 헤더 존중
+
+이 PoC는 RN 본가가 절대 흡수 못 하는 우리 핵심 가치를 검증함.
+
+### PoC-C: 인터셉터 순서 및 Bridge 검증 (기존 가정 보존)
+
+1. **OkHttp Network Interceptor에서 short-circuit → RN DevTools 표시?**
+2. **iOS NSURLProtocol 합성 응답 → RN DevTools 표시?**
 3. **Bridge 왕복 50ms 이내?**
 
-→ Day 1 PoC 목표.
+→ PoC-A 결과와 무관하게 경로 B 기술 검증 목적으로 진행.
 
 ---
 

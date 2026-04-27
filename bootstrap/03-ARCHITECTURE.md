@@ -240,12 +240,16 @@ import { DevToolsPanel } from '@webbridge-native/devtools';
 
 ## 차별점 (포지셔닝)
 
-| 비교 | 한계 | WebBridge Native 차별점 |
+| 비교 | 그들의 한계 | WebBridge Native 차별점 |
 |---|---|---|
-| MSW | RN에서 Network 탭 미가시 | Native bridge로 가시성 + 시맨틱 통합 |
-| react-native-cookies | 단순 read/write | 자동 관리 + RFC 6265 |
-| Reactotron / Flipper | 관찰만 | 시맨틱 자체를 브라우저와 일치 |
-| axios + interceptors | axios 종속 | fetch 표준 → 모든 클라이언트 호환 |
+| MSW (`msw/native`) | RN 본가 DevTools에 mock 안 보임. 일부 인터셉터 미통합 | Native 가시성 + 시맨틱 통합 |
+| Radon IDE Network Inspector | IDE 종속. 라이브러리 아님. mock/cookies 안 함 | 라이브러리 + mock + 시맨틱 |
+| `react-native-network-logger` | 인스펙터만. mock 없음 | mock + 시맨틱 + 가시성 |
+| `@react-native-cookies/cookies` | 단순 get/set. 자동 관리 없음 | RFC 6265 + SameSite 자동 |
+| `react-native-nitro-cookies` | 동기 API 좋음. 단 여전히 수동 | 자동 첨부 + 통합 |
+| `fetch-cookie` | Node.js 중심. RN 비호환 가능 | RN 일급 지원 |
+| `@react-native-community/fetch` | 스트리밍만. cookie/CORS 한계 인정 | 한계 자체를 우회 |
+| RN 본가 0.81+ DevTools | fetch/XHR 자동 기록. 단 mock 가시성 X | 본가가 안 잡는 영역 보강 |
 
 ---
 
