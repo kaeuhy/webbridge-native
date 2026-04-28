@@ -1,62 +1,67 @@
 # WebBridge Native
 
 [![CI](https://github.com/kaeuhy/webbridge-native/actions/workflows/ci.yml/badge.svg)](https://github.com/kaeuhy/webbridge-native/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@webbridge-native/core)](https://www.npmjs.com/package/@webbridge-native/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> Browser-compatible networking for React Native
+> **React Native에서 브라우저와 동일한 네트워킹 경험을 제공합니다.**
 
 ---
 
-## What is this?
+## 왜 필요한가?
 
-`fetch()` works perfectly in the browser — cookies are stored automatically, `User-Agent` is set, `Cache-Control` is respected, and everything shows up in DevTools. In React Native, **none of this is guaranteed**.
+브라우저에서 `fetch()`는 그냥 동작합니다:
 
-**WebBridge Native** bridges that gap. It brings browser networking semantics to React Native through native-level interception, not JS monkey-patching.
-
-## Why not existing solutions?
-
-| Existing | What it does | What it doesn't |
+| 기능 | 브라우저 | React Native |
 |---|---|---|
-| MSW (`msw/native`) | MSW DSL in RN | No DevTools visibility, no semantic integration |
-| `@react-native-cookies/cookies` | Cookie get/set | No auto-management, no RFC 6265 compliance |
-| RN 0.81+ DevTools | Auto-records fetch/XHR | No mock visibility, no cookie/cache semantics |
-| `react-native-network-logger` | Network inspection | No mocking, no semantics |
+| 쿠키 자동 저장/전송 | **자동** | 부분적, 불안정 |
+| User-Agent, Accept-Language | **자동** | 없음 |
+| Cache-Control 존중 | **자동** | 없음 |
+| SameSite 쿠키 정책 | **자동** | 없음 |
+| 리다이렉트 시 헤더 strip | **자동** | 없음 |
+| DevTools Network 탭 | **자동** | 부분적 |
 
-**WebBridge Native** is the only library that integrates cookies + cache + redirect + headers + CORS semantics with MSW-compatible mocking and native visibility — **in one place**.
+React Native 공식 문서도 인정합니다: *"Cookie based authentication is currently unstable."*
 
-## Key Features
+**WebBridge Native는 이 격차를 메웁니다.** RN 앱에서 브라우저와 동일한 네트워킹 동작을 보장합니다.
 
-- **Cookie Jar** — RFC 6265 compliant with SameSite, HttpOnly, Secure, Public Suffix validation
-- **HTTP Cache** — RFC 7234 with ETag/304, Vary, LRU eviction
-- **Redirect Handler** — 301-308 with method change, cross-origin header stripping
-- **Header Normalizer** — Browser-like User-Agent, Accept-Language, Origin
-- **MSW-compatible Mock** — Same DSL as MSW v2, visible in RN DevTools
-- **Native Bridge** — NSURLProtocol (iOS) / OkHttp Network Interceptor (Android)
-- **Opt-out Friendly** — Use only what you need, disable what you don't
+## 기존 RN 솔루션과 비교
 
-## Packages
-
-| Package | Description | Status |
+| 기존 솔루션 | 하는 것 | 안 하는 것 |
 |---|---|---|
-| `@webbridge-native/core` | Types, interceptor chain, utilities | Stable |
-| `@webbridge-native/cookies` | RFC 6265 cookie jar | Stable |
-| `@webbridge-native/headers` | Header normalizer | Stable |
-| `@webbridge-native/mock` | MSW-compatible mocking | Stable |
-| `@webbridge-native/cache` | HTTP cache (RFC 7234) | Stable |
-| `@webbridge-native/redirect` | Redirect handler | Stable |
-| `@webbridge-native/devtools` | Request logger, HAR export | Stable |
-| `@webbridge-native/native-bridge` | iOS/Android native modules | Beta |
-| `@webbridge-native/cors` | CORS simulator (dev-only) | Stable |
-| `@webbridge-native/sse` | EventSource polyfill | Alpha |
-| `@webbridge-native/preset` | One-call setup bundle | Stable |
-| `@webbridge-native/adapter-axios` | Axios adapter | Stable |
-| `@webbridge-native/adapter-react-query` | React Query integration | Stable |
+| `@react-native-cookies/cookies` | 쿠키 get/set | 자동 관리 없음, RFC 미준수 |
+| MSW (`msw/native`) | RN에서 MSW 사용 | DevTools 미표시, 시맨틱 없음 |
+| RN 0.81+ DevTools | fetch/XHR 기록 | mock 미표시, 쿠키/캐시 없음 |
 
-## Quick Start
+**WebBridge Native**: 쿠키 + 캐시 + 리다이렉트 + 헤더 + mock을 **하나의 라이브러리로 통합**. RN에서 브라우저처럼.
+
+## 패키지
+
+| 패키지 | 설명 |
+|---|---|
+| [`@webbridge-native/preset`](packages/preset) | **한 줄 설정** — RN 프로젝트에 브라우저 시맨틱 즉시 적용 |
+| [`@webbridge-native/core`](packages/core) | 인터셉터 체인, 타입 정의 |
+| [`@webbridge-native/cookies`](packages/cookies) | RFC 6265 쿠키 자동 관리 (RN에서 브라우저처럼) |
+| [`@webbridge-native/headers`](packages/headers) | User-Agent, Accept-Language 자동 주입 |
+| [`@webbridge-native/mock`](packages/mock) | MSW v2 호환 mock (RN DevTools에서 보임) |
+| [`@webbridge-native/cache`](packages/cache) | RFC 7234 HTTP 캐시 (RN에서 브라우저처럼) |
+| [`@webbridge-native/redirect`](packages/redirect) | 301-308 리다이렉트 (브라우저 동일 동작) |
+| [`@webbridge-native/devtools`](packages/devtools) | RN 인앱 네트워크 인스펙터 |
+| [`@webbridge-native/native-bridge`](packages/native-bridge) | iOS/Android Native 네트워크 통합 |
+| [`@webbridge-native/cors`](packages/cors) | RN 개발 시 CORS 사전 감지 (dev-only) |
+| [`@webbridge-native/sse`](packages/sse) | RN EventSource 폴리필 |
+| [`@webbridge-native/adapter-axios`](packages/adapter-axios) | RN axios 프로젝트 통합 |
+| [`@webbridge-native/adapter-react-query`](packages/adapter-react-query) | RN React Query 통합 |
+
+## 빠른 시작
+
+### 1. 설치 (RN 프로젝트에서)
 
 ```bash
 pnpm add @webbridge-native/preset
 ```
+
+### 2. 설정 (App.tsx 또는 진입점)
 
 ```typescript
 import { setupWebBridge } from '@webbridge-native/preset';
@@ -66,120 +71,61 @@ const { client } = setupWebBridge({
   headers: { userAgent: 'browser-like' },
 });
 
-// Cookies auto-managed, headers auto-injected
-const res = await client.fetch('https://api.example.com/me');
+// RN에서도 브라우저처럼 동작
+const res = await client.fetch('https://api.myapp.com/me');
 ```
 
-### MSW-compatible Mocking
+### 3. 로그인 (쿠키 자동 관리)
+
+```typescript
+await client.fetch('https://api.myapp.com/login', {
+  method: 'POST',
+  body: JSON.stringify({ email: 'user@app.com', password: '1234' }),
+});
+// Set-Cookie 자동 저장
+
+const me = await client.fetch('https://api.myapp.com/me');
+// Cookie 헤더 자동 첨부 (브라우저처럼)
+```
+
+### 4. MSW 호환 Mock (RN 개발/테스트)
 
 ```typescript
 import { setupServer, http, HttpResponse } from '@webbridge-native/mock';
 
 const server = setupServer(
-  http.get('https://api.example.com/users/:id', ({ params }) => {
+  http.get('https://api.myapp.com/users/:id', ({ params }) => {
     return HttpResponse.json({ id: params.id, name: 'Alice' });
   }),
 );
-
 server.listen();
 ```
 
-### Individual Package Usage
+### 5. axios / React Query 통합
 
 ```typescript
-import { WebBridgeClient } from '@webbridge-native/core';
-import { CookieJar, cookieInterceptor } from '@webbridge-native/cookies';
-import { cacheInterceptor, HttpCache } from '@webbridge-native/cache';
-import { redirectInterceptor } from '@webbridge-native/redirect';
-
-const client = new WebBridgeClient();
-const jar = new CookieJar();
-const cache = new HttpCache();
-
-client.use(redirectInterceptor());
-client.use(cookieInterceptor({ jar }));
-client.use(cacheInterceptor({ cache }));
-client.use(terminalInterceptor); // your network layer
-```
-
-### Axios Integration
-
-```typescript
-import axios from 'axios';
+// axios
 import { createAxiosAdapter } from '@webbridge-native/adapter-axios';
+const api = axios.create({ adapter: createAxiosAdapter(client) });
 
-const { client } = setupWebBridge({ cookies: true });
-const api = axios.create({
-  adapter: createAxiosAdapter(client),
-});
-```
-
-### React Query Integration
-
-```typescript
-import { useQuery } from '@tanstack/react-query';
+// React Query
 import { createFetcher } from '@webbridge-native/adapter-react-query';
-
-const fetcher = createFetcher(client, { baseURL: 'https://api.example.com' });
-
-function useUser(id: string) {
-  return useQuery({
-    queryKey: ['user', id],
-    queryFn: ({ signal }) => fetcher.json(`/users/${id}`, { signal }),
-  });
-}
+const fetcher = createFetcher(client, { baseURL: 'https://api.myapp.com' });
 ```
 
-## Requirements
+## 요구 사항
 
-- React Native 0.73+
-- iOS 13.0+
-- Android API 24+
-- New Architecture enabled
+- **React Native 0.73+** (New Architecture)
+- iOS 13.0+ / Android API 24+
 
-## Architecture
+## 아키텍처
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ Layer 4: Developer-Facing API                       │
-│  MSW DSL, setupWebBridge, DevTools, Adapters        │
-├─────────────────────────────────────────────────────┤
-│ Layer 3: Web Semantics Engine                       │
-│  CookieJar, HttpCache, CORS, HeaderNormalizer       │
-├─────────────────────────────────────────────────────┤
-│ Layer 2: Request Pipeline                           │
-│  Interceptor chain, redirect handler                │
-├─────────────────────────────────────────────────────┤
-│ Layer 1: Native Network Bridge                      │
-│  NSURLProtocol (iOS) / OkHttp Interceptor (Android) │
-└─────────────────────────────────────────────────────┘
+Layer 4: 개발자 API (preset, mock, adapters)
+Layer 3: 브라우저 시맨틱 (cookies, cache, headers, cors)
+Layer 2: 요청 파이프라인 (인터셉터 체인, redirect)
+Layer 1: Native 브릿지 (NSURLProtocol / OkHttp)
 ```
-
-## Testing
-
-```bash
-pnpm install
-pnpm verify          # typecheck + lint + test (354 tests)
-pnpm harness:all     # harness tests
-```
-
-## Validated Scenarios
-
-354 tests across 13 packages covering:
-- SSO login with 5-step redirect chain
-- Token refresh race condition (1 refresh for 10 concurrent requests)
-- Public Suffix List security (21 domains)
-- Cross-origin credential stripping
-- ETag 304 conditional requests
-- Vary header cache separation (5 languages)
-- 500 concurrent requests
-- 10,000 sequential requests with bounded memory
-
-See [docs/VALIDATION_REPORT_2026-04-28.md](docs/VALIDATION_REPORT_2026-04-28.md) for details.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

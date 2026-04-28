@@ -1,55 +1,44 @@
 # @webbridge-native/preset
 
-> One-call setup for WebBridge Native. Batteries included.
+> RN 프로젝트에 브라우저 네트워킹을 한 줄로 적용.
 
-## Installation
+## 설치
 
 ```bash
 pnpm add @webbridge-native/preset
 ```
 
-## Usage
+## 사용법
 
 ```typescript
 import { setupWebBridge } from '@webbridge-native/preset';
 
 const { client, cookieJar, dispose } = setupWebBridge({
-  cookies: true,                          // auto cookie management
-  headers: { userAgent: 'browser-like' }, // auto header injection
-  mock: {                                 // optional: MSW-compatible mocking
+  cookies: true,                          // 쿠키 자동 관리 (브라우저처럼)
+  headers: { userAgent: 'browser-like' }, // 헤더 자동 주입
+  mock: {                                 // 선택: MSW 호환 mock
     handlers: [
       http.get('/api/users', () => HttpResponse.json([])),
     ],
   },
 });
 
-// All features active
-const res = await client.fetch('https://api.example.com/me');
+// RN에서 브라우저처럼
+const res = await client.fetch('https://api.myapp.com/me');
 
-// Clean up
+// 정리
 dispose();
 ```
 
-### Options
+### 옵션
 
-| Option | Default | Description |
+| 옵션 | 기본값 | 설명 |
 |---|---|---|
-| `cookies` | `true` | `true` / `false` / `{ persistent: true }` |
-| `headers` | auto | `HeaderInterceptorOptions` / `false` |
-| `mock` | none | `{ handlers: RequestHandler[] }` / `false` |
-| `interceptors` | none | Additional custom interceptors |
-| `skipDefaultTerminal` | `false` | Skip globalThis.fetch terminal |
-
-### Re-exports
-
-Preset re-exports commonly used types for convenience:
-
-```typescript
-import {
-  WebBridgeClient, CookieJar, headerInterceptor,
-  setupServer, http, HttpResponse,
-} from '@webbridge-native/preset';
-```
+| `cookies` | `true` | 쿠키 자동 관리 / `{ persistent: true }` / `false` |
+| `headers` | 자동 | 헤더 옵션 / `false` |
+| `mock` | 없음 | MSW 핸들러 / `false` |
+| `interceptors` | 없음 | 추가 인터셉터 |
+| `skipDefaultTerminal` | `false` | 기본 fetch terminal 비활성 |
 
 ## License
 
