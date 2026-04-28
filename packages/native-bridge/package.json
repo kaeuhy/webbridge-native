@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/native-bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "iOS/Android native modules for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
