@@ -1,0 +1,31 @@
+{
+  "name": "@webbridge-native/adapter-axios",
+  "version": "0.1.0",
+  "description": "Axios adapter for WebBridge Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "axios": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "axios": {
+      "optional": false
+    }
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
