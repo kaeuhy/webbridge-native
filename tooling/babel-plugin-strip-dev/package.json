@@ -1,7 +1,0 @@
-{
-  "name": "@webbridge-native/babel-plugin-strip-dev",
-  "version": "0.1.0",
-  "description": "Babel plugin to strip dev-only WebBridge Native packages in production builds",
-  "main": "index.js",
-  "license": "MIT"
-}
