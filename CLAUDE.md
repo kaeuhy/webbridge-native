@@ -80,6 +80,7 @@ release/v0.2.0 → PR → main (배포 — Claude가 직접 PR 생성+머지)
 - develop에서 직접 main으로 PR 금지.
 - 반드시 `release/*` 브랜치를 파생하여 main으로 PR.
 - release 브랜치에서 내부 파일 제거 후 PR 생성.
+- **release PR은 반드시 squash merge** (`gh pr merge --squash`). rebase/merge commit 사용 금지.
 - PR은 Claude가 직접 생성하고 머지한다 (사용자 승인 불요).
 - main 머지 시 release.yml이 npm publish 자동 트리거.
 
@@ -101,6 +102,25 @@ v0.1.0 개발 과정에서 orphan 브랜치를 사용하여 다음 문제가 발
 **올바른 방법**: main과 develop은 항상 공통 조상을 공유해야 함. main에서 내부 파일을 제외하려면 orphan이 아니라 **release 브랜치에서 파일을 삭제하고 PR로 머지**하면 됨.
 
 **이 규칙을 위반하면 작업을 즉시 중단하고 사용자에게 보고할 것.**
+
+### branch protection 해제 금지
+
+**main, develop의 branch protection을 해제하는 상황을 절대 만들지 마라.**
+
+v0.1.0에서 protection 해제가 5회 이상 필요했던 원인:
+1. orphan 브랜치로 히스토리 분리 → force push 필요 → protection 해제
+2. release PR을 rebase merge하여 develop 커밋이 main에 전부 노출 → 수정 위해 force push → protection 해제
+
+**이런 상황이 발생하지 않기 위한 규칙:**
+
+1. **orphan 브랜치 금지** (위 규칙 참고)
+2. **force push 금지** — 어떤 상황에서도 `--force`/`--force-with-lease` 사용 금지
+3. **release PR은 반드시 squash merge** — GitHub repo Settings → General → Pull Requests → "Allow squash merging" 활성화 필수. release 브랜치의 모든 커밋이 main에서 1개 커밋으로 합쳐짐.
+4. **main에는 release 커밋만** — `chore(release): vX.Y.Z` 형식의 커밋만 존재. develop의 작업 커밋이 main에 보여서는 안 됨.
+5. **develop → main 직접 머지 금지** — 반드시 release/* 브랜치 경유.
+
+**이 규칙들을 모두 따르면 protection 해제가 필요한 상황 자체가 발생하지 않는다.**
+**protection 해제가 필요하다고 판단되면 접근 방법이 잘못된 것이다. 멈추고 다시 생각하라.**
 
 ### main에 포함하면 안 되는 파일
 - `bootstrap/` — 내부 설계 문서
