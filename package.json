@@ -20,6 +20,7 @@
     "poc:devtools-visibility": "node scripts/poc-devtools-visibility.js"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
     "@changesets/cli": "^2.27.0",
     "@tanstack/react-query": "^5.100.5",
     "@types/jest": "^30.0.0",
