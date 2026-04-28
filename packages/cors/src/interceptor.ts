@@ -33,7 +33,7 @@ export function corsInterceptor(options: CorsInterceptorOptions): Interceptor {
     const needsPreflight = !isSimpleRequest(request.method, request.headers);
 
     if (needsPreflight) {
-      // TODO: 실제 OPTIONS preflight 요청은 native-bridge 통합 후 구현
+      // TODO: 실제 OPTIONS preflight 요청 구현
       // 현재는 실제 요청만 실행하고 응답 헤더로 CORS 검증
     }
 

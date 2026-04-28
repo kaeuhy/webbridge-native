@@ -29,8 +29,7 @@ interface Event {
  * RN은 EventSource를 기본 지원하지 않으므로 폴리필 제공.
  * 자동 재연결, last-event-id 지원.
  *
- * NOTE: 실제 네트워크 스트리밍은 RN 환경(native-bridge 통합) 후 완성.
- * 현재는 인터페이스 + 이벤트 디스패치 로직만 구현.
+ * fetch streaming 기반 연결. 순수 JS/TS로 RN에서 동작.
  */
 export class EventSource {
   static readonly CONNECTING = 0;
