@@ -16,7 +16,7 @@ import { createRequest } from './utils';
  * ```typescript
  * const client = new WebBridgeClient();
  * client.use(cookieInterceptor);
- * client.use(nativeBridgeInterceptor);
+ * client.use(terminalInterceptor);
  * const response = await client.fetch('https://api.example.com/users');
  * ```
  */
@@ -51,7 +51,7 @@ export class WebBridgeClient {
     if (this.interceptors.length === 0) {
       throw new Error(
         'WebBridgeClient: No interceptors registered. ' +
-          'At least one interceptor (e.g., nativeBridgeInterceptor) is required.',
+          'At least one interceptor (e.g., terminal interceptor) is required.',
       );
     }
 
@@ -66,7 +66,7 @@ export class WebBridgeClient {
       throw new Error(
         'WebBridgeClient: Interceptor chain exhausted. ' +
           'The last interceptor must not call next(). ' +
-          'Ensure a terminal interceptor (e.g., nativeBridgeInterceptor) is registered last.',
+          'Ensure a terminal interceptor (e.g., terminal interceptor) is registered last.',
       );
     }
 

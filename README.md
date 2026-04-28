@@ -47,7 +47,6 @@ React Native 공식 문서도 인정합니다: *"Cookie based authentication is 
 | [`@webbridge-native/cache`](packages/cache) | RFC 7234 HTTP 캐시 (RN에서 브라우저처럼) |
 | [`@webbridge-native/redirect`](packages/redirect) | 301-308 리다이렉트 (브라우저 동일 동작) |
 | [`@webbridge-native/devtools`](packages/devtools) | RN 인앱 네트워크 인스펙터 |
-| [`@webbridge-native/native-bridge`](packages/native-bridge) | iOS/Android Native 네트워크 통합 |
 | [`@webbridge-native/cors`](packages/cors) | RN 개발 시 CORS 사전 감지 (dev-only) |
 | [`@webbridge-native/sse`](packages/sse) | RN EventSource 폴리필 |
 | [`@webbridge-native/adapter-axios`](packages/adapter-axios) | RN axios 프로젝트 통합 |
@@ -115,17 +114,18 @@ const fetcher = createFetcher(client, { baseURL: 'https://api.myapp.com' });
 
 ## 요구 사항
 
-- **React Native 0.73+** (New Architecture)
-- iOS 13.0+ / Android API 24+
+- **React Native 0.73+**
+- 순수 JS/TS — native module 없음, Expo 호환
 
 ## 아키텍처
 
 ```
-Layer 4: 개발자 API (preset, mock, adapters)
-Layer 3: 브라우저 시맨틱 (cookies, cache, headers, cors)
-Layer 2: 요청 파이프라인 (인터셉터 체인, redirect)
-Layer 1: Native 브릿지 (NSURLProtocol / OkHttp)
+Layer 3: 개발자 API (preset, mock, adapters)
+Layer 2: 브라우저 시맨틱 (cookies, cache, headers, cors)
+Layer 1: 요청 파이프라인 (인터셉터 체인, redirect, devtools)
 ```
+
+순수 JS/TS — native module 없음.
 
 ## License
 

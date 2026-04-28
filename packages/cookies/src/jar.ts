@@ -7,7 +7,7 @@ export interface CookieJarOptions {
   /**
    * 영속화 활성화 여부.
    * true면 PersistentCookieStore 사용 (MMKV 기반).
-   * 현재는 메모리 전용, MMKV 통합은 native-bridge 구현 후 추가.
+   * 현재는 메모리 전용. PersistentCookieStore로 영속화 가능.
    */
   persistent?: boolean;
 }
@@ -141,8 +141,6 @@ export class CookieJar {
   }
 
   private persist(): void {
-    // TODO: MMKV 영속화 구현 (native-bridge 통합 후)
-    // const data = this.store.serialize();
-    // mmkv.set('webbridge-cookies', data);
+    // 영속화는 PersistentCookieStore 사용
   }
 }
