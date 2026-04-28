@@ -724,6 +724,29 @@ tough-cookie, node only, RN compatibility, transitive, stream
 
 ---
 
+---
+
+### TS-REL-001: release PR 후 내부 파일 정리 PR이 별도로 생겨 main 커밋이 2개가 됨
+
+**발생 버전**: v0.4.0
+
+**증상**: main 브랜치에 `chore(release): v0.4.0`과 `chore(release): remove internal files from main` 커밋이 별도로 존재. "main에는 release 커밋만" 규칙 위반.
+
+**원인**: release 브랜치에서 내부 파일을 제거했지만, main과의 merge 충돌 해결 과정에서 `git merge origin/main`을 실행하여 main의 이전 상태(내부 파일 없음)와 release의 상태(내부 파일 있음→삭제)가 충돌. merge 커밋이 squash에 포함되면서 내부 파일이 다시 main에 유입됨. 이를 정리하기 위해 별도 PR을 만들어 커밋이 2개로 분리.
+
+**해결**: force push는 절대 규칙 위반이므로 v0.4.0은 커밋 2개로 유지.
+
+**예방**:
+1. release 브랜치에서 **내부 파일 제거를 먼저** 수행
+2. 그 다음 `git merge origin/main`으로 충돌 해결
+3. 충돌 해결 시 내부 파일은 **삭제 상태 유지** (`git rm`으로 확정)
+4. 모든 준비가 완료된 후 **단일 PR**로 main에 squash merge
+5. 후속 정리 PR을 만들지 않는다
+
+**키워드**: release, main, squash, 내부 파일, 커밋 2개, 정리 PR
+
+---
+
 ## 자가 확장 규칙 (`/add-troubleshoot-entry`)
 
 새 항목 추가 시:
