@@ -5,7 +5,6 @@
  * 캐시 저장 시 메모리 + 디스크 동시 저장.
  */
 
-import type { WebBridgeResponse } from '@webbridge-native/core';
 import { HttpCache } from './store';
 import type { HttpCacheOptions, CacheEntry } from './store';
 
