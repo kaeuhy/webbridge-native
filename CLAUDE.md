@@ -59,22 +59,55 @@ WebBridge Native의 시니어 컨트리뷰터. RN, TypeScript, iOS(Swift), Andro
 
 ## 브랜치 전략
 
-- **`main`**: 릴리즈/배포 전용. 직접 커밋 금지. develop에서 squash merge로만 반영.
-- **`develop`**: 일상 작업 브랜치. 모든 feature/fix 브랜치는 여기서 분기하고 여기로 머지.
-- **feature/fix 브랜치**: `develop`에서 분기 → PR → `develop`으로 머지.
-- **릴리즈 시**: `develop` → `main`으로 squash merge. 사용자가 보는 main은 깨끗한 릴리즈 커밋만.
+### 브랜치 구조
+- **`main`**: 배포 전용. npm publish 트리거. 사용자가 보는 코드.
+  - 직접 push 금지. PR로만 머지.
+  - 내부 파일 포함 금지 (`bootstrap/`, `.claude/`, `harness/`, `CLAUDE.md`, PoC 스크립트 등).
+- **`develop`**: 일상 작업 브랜치.
+  - 직접 push 금지. PR로만 머지.
+  - 모든 feature/fix 브랜치는 여기서 분기하고 여기로 머지.
+- **`feat/*`, `fix/*`, `chore/*`**: 작업 브랜치. develop에서 분기 → PR → develop 머지.
+- **`release/*`**: 릴리즈 브랜치. develop에서 분기 → main으로 PR.
+
+### PR 흐름
+```
+feat/xxx → PR → develop     (일상 작업)
+develop → release/v0.2.0    (릴리즈 준비)
+release/v0.2.0 → PR → main (배포 — Claude가 직접 PR 생성+머지)
+```
+
+### main PR 규칙
+- develop에서 직접 main으로 PR 금지.
+- 반드시 `release/*` 브랜치를 파생하여 main으로 PR.
+- release 브랜치에서 내부 파일 제거 후 PR 생성.
+- PR은 Claude가 직접 생성하고 머지한다 (사용자 승인 불요).
+- main 머지 시 release.yml이 npm publish 자동 트리거.
+
+### 브랜치 정리
+- 머지 완료된 브랜치는 즉시 삭제 (`--delete-branch`).
+- 원격에 불필요한 브랜치가 남아있으면 안 됨.
+
+### main에 포함하면 안 되는 파일
+- `bootstrap/` — 내부 설계 문서
+- `.claude/` — 슬래시 명령, 에이전트
+- `harness/` — 검증 인프라
+- `CLAUDE.md` — 프로젝트 헌법 (내부용)
+- `scripts/poc-*` — PoC 스크립트
+- `docs/COMPETITIVE_LANDSCAPE.md` — 경쟁 분석 (내부용)
+- `docs/VALIDATION_REPORT_*.md` — 검증 리포트 (내부용)
+- `docs/DATA_PROCESSING.md` — DPA 문서 (별도 배포)
 
 ## 작업 워크플로우
 
 1. `git checkout develop && git pull`
 2. `git checkout -b <type>/<short-desc>` (type: feat/fix/chore/docs/refactor)
 3. SPEC.md 체크리스트 확인
-4. 실패 harness 시나리오 추가
-5. 구현
-6. `pnpm verify --filter @webbridge-native/<n>` 통과
-7. `pnpm harness:<관련>` 통과
-8. Conventional Commits로 커밋
-9. `gh pr create --base develop` (07-GITHUB_WORKFLOW.md 형식)
+4. 구현 + 테스트
+5. `pnpm verify` 통과
+6. Conventional Commits로 커밋
+7. `git push -u origin <branch>`
+8. `gh pr create --base develop`
+9. 머지 후 `git push origin --delete <branch>`
 
 ### Conventional Commits 형식
 
