@@ -87,6 +87,21 @@ release/v0.2.0 → PR → main (배포 — Claude가 직접 PR 생성+머지)
 - 머지 완료된 브랜치는 즉시 삭제 (`--delete-branch`).
 - 원격에 불필요한 브랜치가 남아있으면 안 됨.
 
+### orphan 브랜치 사용 금지
+
+**`git checkout --orphan` 절대 사용 금지.**
+
+v0.1.0 개발 과정에서 orphan 브랜치를 사용하여 다음 문제가 발생했음:
+- main과 develop 사이에 공통 히스토리가 없어 PR 생성 불가 (`no history in common`)
+- force push를 반복해야 했고, branch protection과 충돌
+- 브랜치 정리가 복잡해져 3회 이상 main을 재구성
+
+**원인**: main을 "깨끗하게" 만들기 위해 orphan으로 빈 커밋을 만들었으나, 이후 develop과 히스토리가 분리되어 git의 기본 기능(merge, PR, rebase)이 모두 깨짐.
+
+**올바른 방법**: main과 develop은 항상 공통 조상을 공유해야 함. main에서 내부 파일을 제외하려면 orphan이 아니라 **release 브랜치에서 파일을 삭제하고 PR로 머지**하면 됨.
+
+**이 규칙을 위반하면 작업을 즉시 중단하고 사용자에게 보고할 것.**
+
 ### main에 포함하면 안 되는 파일
 - `bootstrap/` — 내부 설계 문서
 - `.claude/` — 슬래시 명령, 에이전트
