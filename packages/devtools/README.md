@@ -1,45 +1,39 @@
 # @webbridge-native/devtools
 
-> Request logger, HAR export, and curl generation for WebBridge Native.
+> RN 인앱 네트워크 인스펙터. 요청 로깅, HAR export, curl 생성.
 
-## Installation
+## 설치
 
 ```bash
 pnpm add @webbridge-native/devtools @webbridge-native/core
 ```
 
-## Usage
+## 사용법
 
 ```typescript
-import { WebBridgeClient } from '@webbridge-native/core';
-import { RequestLogger, devtoolsInterceptor } from '@webbridge-native/devtools';
+import { RequestLogger, devtoolsInterceptor, DevToolsPanel } from '@webbridge-native/devtools';
 
-const logger = new RequestLogger({
-  maxEntries: 500,        // default 500
-  maxBodySize: 64 * 1024, // default 64KB (truncates larger bodies)
-});
+const logger = new RequestLogger({ maxEntries: 500, maxBodySize: 64 * 1024 });
+client.use(devtoolsInterceptor({ logger })); // 인터셉터 체인 첫 번째에 등록
 
-const client = new WebBridgeClient();
-client.use(devtoolsInterceptor({ logger })); // add first for full timing
-client.use(terminalInterceptor);
-
-await client.fetch('https://api.example.com/users');
-
-// Get all logged entries
+// 로그 조회
 const entries = logger.getEntries();
-
-// Filter
 const errors = logger.filter(e => e.status >= 400);
 
-// Export as HAR 1.2
+// HAR export (QA 버그 리포트 첨부)
 const har = logger.toHAR();
 
-// Generate curl command
+// curl 명령 복사
 const curl = logger.toCurl(entries[0]);
 
-// Clear
-logger.clear();
+// DevToolsPanel (UI 데이터 레이어)
+const panel = new DevToolsPanel(logger);
+panel.setFilter({ method: 'GET', minStatus: 400 });
+panel.onUpdate((filtered) => { /* RN UI 업데이트 */ });
+panel.getSummary(); // { total, success, error, cached, avgDuration }
 ```
+
+**Production**: `@webbridge-native/babel-plugin-strip-dev`로 자동 제거.
 
 ## License
 

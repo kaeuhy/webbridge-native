@@ -1,48 +1,42 @@
 # @webbridge-native/redirect
 
-> Browser-compatible redirect handling for React Native.
+> RN에서 브라우저와 동일한 리다이렉트 처리.
 
-## Installation
+## Problem
+
+RN의 기본 redirect 처리는 브라우저와 다릅니다: `redirect: 'manual'`이 부정확하고, 크로스 오리진 리다이렉트 시 Authorization 헤더가 그대로 전달되어 **토큰 유출 위험**이 있습니다.
+
+## Solution
+
+브라우저 Fetch 스펙과 동일한 리다이렉트 동작을 RN에 제공합니다.
+
+## 설치
 
 ```bash
 pnpm add @webbridge-native/redirect @webbridge-native/core
 ```
 
-## Usage
+## 사용법
 
 ```typescript
-import { WebBridgeClient } from '@webbridge-native/core';
 import { redirectInterceptor } from '@webbridge-native/redirect';
 
-const client = new WebBridgeClient();
 client.use(redirectInterceptor());
-client.use(terminalInterceptor);
 
-// Automatically follows redirects (max 5)
-const res = await client.fetch('https://example.com/old-page');
-// res.redirected === true
-// res.url === 'https://example.com/new-page'
-
-// Manual mode — get the redirect response as-is
-const res = await client.fetch('https://example.com/old', { redirect: 'manual' });
-// res.status === 301
-
-// Error mode — throw on redirect
-await client.fetch('https://example.com/old', { redirect: 'error' });
-// TypeError: Redirect response (301) received with redirect mode "error"
+// 자동 follow (최대 5회)
+const res = await client.fetch('https://api.myapp.com/old');
+// res.redirected === true, res.url === 최종 URL
 ```
 
-## Behavior
+## 브라우저 호환 동작
 
-| Status | Method Change | Body |
+| 상태 | 메서드 변경 | 보안 |
 |---|---|---|
-| 301, 302, 303 | → GET | Removed |
-| 307, 308 | Preserved | Preserved |
+| 301, 302, 303 | → GET, body 제거 | cross-origin 시 Auth/Cookie strip |
+| 307, 308 | 유지 | cross-origin 시 Auth/Cookie strip |
 
-### Security
-- Cross-origin redirects automatically strip: `Authorization`, `Cookie`, `Proxy-Authorization`
-- Invalid Location header throws `TypeError`
-- Max 5 redirects (throws on exceed)
+- `redirect: 'manual'` → 3xx 응답 그대로 반환
+- `redirect: 'error'` → 3xx 시 에러
 
 ## License
 

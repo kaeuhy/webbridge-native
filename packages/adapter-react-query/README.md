@@ -1,46 +1,36 @@
 # @webbridge-native/adapter-react-query
 
-> React Query integration for WebBridge Native.
+> RN React Query 프로젝트에 브라우저 시맨틱을 적용.
 
-## Installation
+## 설치
 
 ```bash
-pnpm add @webbridge-native/adapter-react-query @webbridge-native/core @tanstack/react-query
+pnpm add @webbridge-native/adapter-react-query @webbridge-native/core @webbridge-native/preset @tanstack/react-query
 ```
 
-## Usage
+## 사용법
 
 ```typescript
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { setupWebBridge } from '@webbridge-native/preset';
 import { createFetcher } from '@webbridge-native/adapter-react-query';
 
-const fetcher = createFetcher(client, {
-  baseURL: 'https://api.example.com',
-  defaultHeaders: { Authorization: 'Bearer token' },
-});
+const { client } = setupWebBridge({ cookies: true });
+const fetcher = createFetcher(client, { baseURL: 'https://api.myapp.com' });
 
-// GET with AbortSignal (auto-cancellation on unmount)
 function useUser(id: string) {
   return useQuery({
     queryKey: ['user', id],
     queryFn: ({ signal }) => fetcher.json<User>(`/users/${id}`, { signal }),
   });
 }
-
-// POST
-function useCreateUser() {
-  return useMutation({
-    mutationFn: (data: CreateUserInput) =>
-      fetcher.json<User>('/users', { method: 'POST', body: JSON.stringify(data) }),
-  });
-}
 ```
 
-### Fetcher Methods
+### Fetcher 메서드
 
-- `fetcher.json<T>(url, init?)` — Parse JSON, throw FetchError on non-2xx
-- `fetcher.text(url, init?)` — Return text
-- `fetcher.raw(url, init?)` — Return raw WebBridgeResponse
+- `fetcher.json<T>(url, init?)` — JSON 파싱, non-2xx 시 FetchError throw
+- `fetcher.text(url, init?)` — 텍스트 반환
+- `fetcher.raw(url, init?)` — WebBridgeResponse 반환
 
 ## License
 

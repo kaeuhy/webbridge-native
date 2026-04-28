@@ -1,101 +1,49 @@
 # @webbridge-native/mock
 
-> MSW v2 compatible mocking for React Native. Same DSL, native DevTools visibility.
+> RN에서 MSW v2와 동일한 DSL로 API를 mock. DevTools에서 보임.
 
-## Installation
+## Problem
+
+MSW는 브라우저/Node.js에서는 잘 동작하지만, RN에서는 DevTools Network 탭에 mock 응답이 표시되지 않습니다. `msw/native`도 이 문제를 해결하지 못합니다.
+
+## Solution
+
+MSW v2와 100% 동일한 DSL을 제공하면서, RN Native 레이어를 통해 DevTools 가시성도 확보합니다.
+
+## 설치
 
 ```bash
 pnpm add @webbridge-native/mock @webbridge-native/core
 ```
 
-## Usage
-
-### Basic Mock Server
+## 사용법
 
 ```typescript
 import { setupServer, http, HttpResponse } from '@webbridge-native/mock';
 
 const server = setupServer(
-  http.get('https://api.example.com/users', () => {
-    return HttpResponse.json([
-      { id: 1, name: 'Alice' },
-      { id: 2, name: 'Bob' },
-    ]);
-  }),
-
-  http.get('https://api.example.com/users/:id', ({ params }) => {
-    return HttpResponse.json({ id: params.id, name: 'Alice' });
-  }),
-
-  http.post('https://api.example.com/users', ({ request }) => {
-    return HttpResponse.json({ id: 3 }, { status: 201 });
-  }),
+  http.get('https://api.myapp.com/users', () =>
+    HttpResponse.json([{ id: 1, name: 'Alice' }]),
+  ),
+  http.get('https://api.myapp.com/users/:id', ({ params }) =>
+    HttpResponse.json({ id: params.id, name: 'Alice' }),
+  ),
+  http.post('https://api.myapp.com/users', () =>
+    HttpResponse.json({ id: 3 }, { status: 201 }),
+  ),
 );
 
-server.listen();  // activate
-server.close();   // deactivate
+server.listen();   // mock 활성화
+server.close();    // 비활성화
+server.resetHandlers(); // 초기 핸들러로 복원
 ```
 
-### With WebBridgeClient
-
-```typescript
-import { WebBridgeClient } from '@webbridge-native/core';
-
-const client = new WebBridgeClient();
-client.use(server.createInterceptor());
-client.use(fallbackInterceptor); // for unmatched requests
-
-const res = await client.fetch('https://api.example.com/users/42');
-// { id: '42', name: 'Alice' }
-```
-
-### Runtime Handler Override
-
-```typescript
-// Override for a specific test
-server.use(
-  http.get('https://api.example.com/users', () => {
-    return HttpResponse.json([]); // empty list
-  }),
-);
-
-// Reset to initial handlers
-server.resetHandlers();
-```
-
-### Response Types
-
-```typescript
-HttpResponse.json({ data: 'value' });                  // JSON
-HttpResponse.json({ error: 'not found' }, { status: 404 }); // with status
-HttpResponse.text('Hello, World!');                     // Plain text
-HttpResponse.error();                                   // Network error
-```
-
-### URL Patterns
-
-```typescript
-http.get('https://api.example.com/users',          handler); // exact
-http.get('https://api.example.com/users/:id',      handler); // path param
-http.get('https://api.example.com/users/:id/posts/:postId', handler); // multiple params
-http.get('https://api.example.com/*',              handler); // wildcard
-```
-
-### Unhandled Request Strategy
-
-```typescript
-const server = setupServer(/* handlers */);
-// Options: 'warn' (default), 'error', 'bypass'
-const server = new MockServer(handlers, { onUnhandledRequest: 'error' });
-```
-
-## MSW Migration
+### MSW에서 마이그레이션
 
 ```diff
 - import { setupServer, http, HttpResponse } from 'msw/node';
 + import { setupServer, http, HttpResponse } from '@webbridge-native/mock';
-
-// Your handlers work as-is. No other changes needed.
+// 핸들러 코드 변경 없음
 ```
 
 ## License
