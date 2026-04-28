@@ -1,5 +1,27 @@
 # @webbridge-native/preset
 
+## 0.2.0
+
+### Minor Changes
+
+- ### Breaking Change
+
+  - `@webbridge-native/native-bridge` removed (npm unpublished)
+
+  ### All packages
+
+  - Pure JS/TS — no native modules, Expo compatible
+  - README rewritten for RN-first messaging
+  - Architecture simplified to 3 layers (no native layer)
+
+### Patch Changes
+
+- Updated dependencies
+  - @webbridge-native/core@0.2.0
+  - @webbridge-native/cookies@0.2.0
+  - @webbridge-native/headers@0.2.0
+  - @webbridge-native/mock@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
