@@ -27,3 +27,4 @@ coverage/
 ios/Pods/
 android/.gradle/
 android/build/
+.idea/
