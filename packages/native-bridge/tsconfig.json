@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@webbridge-native/core": ["../core/src"],
+      "@webbridge-native/mock": ["../mock/src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/__mocks__"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../mock" }
+  ]
+}

@@ -8,6 +8,8 @@ import { headerInterceptor } from '@webbridge-native/headers';
 import type { HeaderInterceptorOptions } from '@webbridge-native/headers';
 import type { RequestHandler } from '@webbridge-native/mock';
 import { MockServer } from '@webbridge-native/mock';
+import { createNativeBridgeInterceptor } from '@webbridge-native/native-bridge';
+import type { NativeBridgeInterceptorOptions } from '@webbridge-native/native-bridge';
 
 export interface WebBridgeOptions {
   /** 쿠키 자동 관리 활성화 (기본: true) */
@@ -18,6 +20,12 @@ export interface WebBridgeOptions {
   mock?: { handlers: RequestHandler[] } | false;
   /** 추가 인터셉터 */
   interceptors?: Interceptor[];
+  /**
+   * Native bridge 활성화 옵션.
+   * true로 설정하면 native 레이어를 통해 요청을 라우팅하여 DevTools 가시성을 확보한다.
+   * Native 모듈 미설치 시 자동으로 globalThis.fetch 폴백.
+   */
+  nativeBridge?: boolean | { timeoutMs?: number };
   /** true면 기본 terminal interceptor(globalThis.fetch)를 추가하지 않는다. 직접 terminal을 등록해야 한다. */
   skipDefaultTerminal?: boolean;
 }
@@ -68,43 +76,71 @@ export function setupWebBridge(options?: WebBridgeOptions): WebBridgeInstance {
     client.use(cookieInterceptor({ jar: cookieJar }));
   }
 
-  // Mock interceptor
+  // Mock interceptor 및 native bridge 분기
   let mockServer: MockServer | null = null;
+  let nativeBridgeDispose: (() => void) | null = null;
+
   if (opts.mock) {
     mockServer = new MockServer(opts.mock.handlers);
     mockServer.listen();
-    client.use(mockServer.createInterceptor());
   }
 
-  // Additional interceptors
-  if (opts.interceptors) {
-    for (const interceptor of opts.interceptors) {
-      client.use(interceptor);
+  if (opts.nativeBridge && !opts.skipDefaultTerminal) {
+    // Native bridge 모드: mock 매칭은 native bridge 내부에서 수행
+    // mock 인터셉터를 체인에 넣지 않음 (native에서 가로챈 요청으로 JS 핸들러 매칭)
+    const bridgeOpts: NativeBridgeInterceptorOptions = {
+      mockServer: mockServer ?? undefined,
+      timeoutMs:
+        typeof opts.nativeBridge === 'object'
+          ? opts.nativeBridge.timeoutMs
+          : undefined,
+    };
+
+    // Additional interceptors (native bridge 전에)
+    if (opts.interceptors) {
+      for (const interceptor of opts.interceptors) {
+        client.use(interceptor);
+      }
     }
-  }
 
-  // Terminal interceptor — 체인의 마지막.
-  // skipDefaultTerminal: true로 설정하면 사용자가 직접 terminal을 추가해야 함.
-  if (!opts.skipDefaultTerminal) {
-    client.use(async (request) => {
-      const res = await globalThis.fetch(request.url, {
-        method: request.method,
-        headers: request.headers,
-        body: request.body ?? undefined,
-        signal: request.signal,
+    const bridge = createNativeBridgeInterceptor(bridgeOpts);
+    client.use(bridge);
+    nativeBridgeDispose = () => bridge.dispose();
+  } else {
+    // 기존 모드: mock 인터셉터를 체인에 직접 등록
+    if (mockServer) {
+      client.use(mockServer.createInterceptor());
+    }
+
+    // Additional interceptors
+    if (opts.interceptors) {
+      for (const interceptor of opts.interceptors) {
+        client.use(interceptor);
+      }
+    }
+
+    // Terminal interceptor — 체인의 마지막.
+    if (!opts.skipDefaultTerminal) {
+      client.use(async (request) => {
+        const res = await globalThis.fetch(request.url, {
+          method: request.method,
+          headers: request.headers,
+          body: request.body ?? undefined,
+          signal: request.signal,
+        });
+        const body = await res.text();
+        return {
+          url: res.url || request.url,
+          status: res.status,
+          statusText: res.statusText,
+          headers: Object.fromEntries(res.headers.entries()),
+          body,
+          ok: res.ok,
+          redirected: res.redirected,
+          type: 'basic' as const,
+        };
       });
-      const body = await res.text();
-      return {
-        url: res.url || request.url,
-        status: res.status,
-        statusText: res.statusText,
-        headers: Object.fromEntries(res.headers.entries()),
-        body,
-        ok: res.ok,
-        redirected: res.redirected,
-        type: 'basic' as const,
-      };
-    });
+    }
   }
 
   return {
@@ -114,6 +150,7 @@ export function setupWebBridge(options?: WebBridgeOptions): WebBridgeInstance {
     dispose() {
       if (mockServer) mockServer.close();
       if (cookieJar) cookieJar.dispose();
+      if (nativeBridgeDispose) nativeBridgeDispose();
     },
   };
 }
@@ -124,3 +161,4 @@ export type { WebBridgeRequest, WebBridgeResponse, Interceptor } from '@webbridg
 export { CookieJar } from '@webbridge-native/cookies';
 export { headerInterceptor } from '@webbridge-native/headers';
 export { setupServer, http, HttpResponse } from '@webbridge-native/mock';
+export { createNativeBridgeInterceptor } from '@webbridge-native/native-bridge';

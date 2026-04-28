@@ -18,7 +18,8 @@
     "@webbridge-native/core": "workspace:*",
     "@webbridge-native/cookies": "workspace:*",
     "@webbridge-native/headers": "workspace:*",
-    "@webbridge-native/mock": "workspace:*"
+    "@webbridge-native/mock": "workspace:*",
+    "@webbridge-native/native-bridge": "workspace:*"
   },
   "license": "MIT",
   "publishConfig": {

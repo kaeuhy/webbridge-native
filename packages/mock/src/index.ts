@@ -6,4 +6,4 @@ export type { SetupServerOptions, UnhandledRequestStrategy } from './server';
 export { http } from './http';
 export { HttpResponse } from './http-response';
 export type { RequestHandler, HandlerContext, HandlerResolver } from './handler';
-export { matchUrl, PASSTHROUGH } from './handler';
+export { matchUrl, findHandler, PASSTHROUGH } from './handler';

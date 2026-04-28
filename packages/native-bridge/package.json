@@ -1,0 +1,45 @@
+{
+  "name": "@webbridge-native/native-bridge",
+  "version": "0.3.0",
+  "description": "Native network bridge for WebBridge Native — iOS NSURLProtocol & Android OkHttp interceptor for DevTools visibility",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "ios",
+    "android",
+    "react-native-webbridge-native-bridge.podspec",
+    "react-native.config.js",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*",
+    "@webbridge-native/mock": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.73.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "react-native": { "optional": true }
+  },
+  "codegenConfig": {
+    "name": "WebBridgeNativeSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.webbridgenative.nativebridge"
+    }
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -7,7 +7,8 @@
       "@webbridge-native/core": ["../core/src"],
       "@webbridge-native/cookies": ["../cookies/src"],
       "@webbridge-native/headers": ["../headers/src"],
-      "@webbridge-native/mock": ["../mock/src"]
+      "@webbridge-native/mock": ["../mock/src"],
+      "@webbridge-native/native-bridge": ["../native-bridge/src"]
     }
   },
   "include": ["src/**/*.ts"],
@@ -16,6 +17,7 @@
     { "path": "../core" },
     { "path": "../cookies" },
     { "path": "../headers" },
-    { "path": "../mock" }
+    { "path": "../mock" },
+    { "path": "../native-bridge" }
   ]
 }
