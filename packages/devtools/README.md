@@ -1,6 +1,6 @@
 # @webbridge-native/devtools
 
-> RN 인앱 네트워크 인스펙터. 요청 로깅, HAR export, curl 생성.
+> RN 인앱 네트워크 인스펙터. 요청 목록, 상세 보기, HAR export, curl 복사.
 
 ## 설치
 
@@ -10,28 +10,56 @@ pnpm add @webbridge-native/devtools @webbridge-native/core
 
 ## 사용법
 
+### 1. 인터셉터 등록
+
 ```typescript
-import { RequestLogger, devtoolsInterceptor, DevToolsPanel } from '@webbridge-native/devtools';
+import { RequestLogger, devtoolsInterceptor } from '@webbridge-native/devtools';
 
 const logger = new RequestLogger({ maxEntries: 500, maxBodySize: 64 * 1024 });
-client.use(devtoolsInterceptor({ logger })); // 인터셉터 체인 첫 번째에 등록
+client.use(devtoolsInterceptor({ logger }));
+```
 
-// 로그 조회
-const entries = logger.getEntries();
-const errors = logger.filter(e => e.status >= 400);
+### 2. UI 패널 (React Native 컴포넌트)
 
-// HAR export (QA 버그 리포트 첨부)
-const har = logger.toHAR();
+```tsx
+import { DevToolsScreen } from '@webbridge-native/devtools/ui';
 
-// curl 명령 복사
-const curl = logger.toCurl(entries[0]);
+// React Navigation
+<Stack.Screen name="DevTools">
+  {() => <DevToolsScreen logger={logger} />}
+</Stack.Screen>
 
-// DevToolsPanel (UI 데이터 레이어)
+// 또는 Modal
+<Modal visible={showDevTools}>
+  <DevToolsScreen logger={logger} onClose={() => setShowDevTools(false)} />
+</Modal>
+```
+
+### 3. 데이터 레이어 (커스텀 UI용)
+
+```typescript
+import { DevToolsPanel } from '@webbridge-native/devtools';
+
 const panel = new DevToolsPanel(logger);
 panel.setFilter({ method: 'GET', minStatus: 400 });
-panel.onUpdate((filtered) => { /* RN UI 업데이트 */ });
+panel.onUpdate((entries) => { /* 커스텀 UI 업데이트 */ });
 panel.getSummary(); // { total, success, error, cached, avgDuration }
 ```
+
+### 4. HAR / curl
+
+```typescript
+const har = logger.toHAR();        // HAR 1.2 export
+const curl = logger.toCurl(entry); // curl 명령 생성
+```
+
+## UI 컴포넌트
+
+| 컴포넌트 | 설명 |
+|---|---|
+| `DevToolsScreen` | 전체 화면 (목록 + 상세) |
+| `NetworkList` | 요청 목록 (검색, 필터, 통계) |
+| `RequestDetail` | 요청/응답 상세 (헤더, body, curl) |
 
 **Production**: `@webbridge-native/babel-plugin-strip-dev`로 자동 제거.
 

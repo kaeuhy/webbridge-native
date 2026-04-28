@@ -8,5 +8,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/ui/**"],
   "references": [{ "path": "../core" }]
 }
