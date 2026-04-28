@@ -79,10 +79,22 @@ release/v0.2.0 → PR → main (배포 — Claude가 직접 PR 생성+머지)
 ### main PR 규칙
 - develop에서 직접 main으로 PR 금지.
 - 반드시 `release/*` 브랜치를 파생하여 main으로 PR.
-- release 브랜치에서 내부 파일 제거 후 PR 생성.
 - **release PR은 반드시 squash merge** (`gh pr merge --squash`). rebase/merge commit 사용 금지.
 - PR은 Claude가 직접 생성하고 머지한다 (사용자 승인 불요).
 - main 머지 시 release.yml이 npm publish 자동 트리거.
+- **main에는 release 커밋만 존재해야 한다.** 후속 정리 PR(내부 파일 제거 등)을 별도로 만들지 마라.
+
+### release 브랜치 절차 (단일 PR 원칙)
+
+**release 브랜치에서 모든 준비를 마친 뒤 main에 PR 1개만 생성한다.**
+
+1. `git checkout develop && git pull`
+2. `git checkout -b release/vX.Y.Z`
+3. **내부 파일 제거** (`bootstrap/`, `.claude/`, `harness/`, `CLAUDE.md`, PoC 스크립트 등)
+4. **main과 merge 충돌 해결** (`git merge origin/main` → 충돌 해결 → 커밋)
+5. 충돌 해결까지 완료된 상태에서 push → main으로 PR 생성 → squash merge
+
+**v0.4.0에서 발생한 문제**: release PR을 먼저 squash merge한 뒤 내부 파일 제거를 별도 PR로 진행하여 main에 커밋 2개가 생김. 이는 "main에는 release 커밋만" 원칙 위반. **내부 파일 제거는 release 브랜치 안에서 merge 전에 완료해야 한다.**
 
 ### 브랜치 정리
 - 머지 완료된 브랜치는 즉시 삭제 (`--delete-branch`).
