@@ -1,0 +1,26 @@
+{
+  "name": "@webbridge-native/preset",
+  "version": "0.1.0",
+  "description": "Tier 1 convenience preset for WebBridge Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*",
+    "@webbridge-native/cookies": "workspace:*",
+    "@webbridge-native/headers": "workspace:*",
+    "@webbridge-native/mock": "workspace:*"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

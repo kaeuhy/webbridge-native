@@ -1,0 +1,182 @@
+import type { Cookie } from './cookie';
+import { domainMatch } from './matching';
+import { isPublicSuffix } from './public-suffix';
+
+/**
+ * Set-Cookie 헤더 문자열을 파싱하여 Cookie 객체를 반환한다.
+ * RFC 6265 §5.2 기반.
+ *
+ * @param header - Set-Cookie 헤더 값 (예: "session=abc; Path=/; HttpOnly")
+ * @param requestUrl - 요청 URL (도메인/경로 기본값 추출용)
+ * @returns Cookie 객체, 또는 파싱 실패 시 null
+ */
+export function parseSetCookie(
+  header: string,
+  requestUrl: string,
+): Cookie | null {
+  const url = parseUrl(requestUrl);
+  if (!url) return null;
+
+  // name=value 파트 분리
+  const semicolonIndex = header.indexOf(';');
+  const nameValuePart =
+    semicolonIndex === -1 ? header : header.slice(0, semicolonIndex);
+  const equalsIndex = nameValuePart.indexOf('=');
+
+  if (equalsIndex === -1) return null;
+
+  const name = nameValuePart.slice(0, equalsIndex).trim();
+  const value = nameValuePart.slice(equalsIndex + 1).trim();
+
+  if (name.length === 0) return null;
+
+  // 속성 파싱
+  const attrs = parseAttributes(
+    semicolonIndex === -1 ? '' : header.slice(semicolonIndex + 1),
+  );
+
+  const now = Date.now();
+
+  // Domain 처리 (RFC 6265 §5.2.3)
+  let domain = attrs.domain ?? url.hostname;
+  domain = domain.replace(/^\./, '').toLowerCase();
+
+  // RFC 6265 §5.3 step 5: domain이 요청 호스트와 매칭되지 않으면 거부
+  if (attrs.domain !== undefined && !domainMatch(domain, url.hostname)) {
+    return null;
+  }
+
+  // RFC 6265 §5.3 step 5: public suffix에 쿠키 설정 거부 (보안)
+  if (attrs.domain !== undefined && isPublicSuffix(domain)) {
+    return null;
+  }
+
+  // Path 처리 (RFC 6265 §5.2.4)
+  const path = attrs.path ?? defaultPath(url.pathname);
+
+  // Expires/Max-Age 처리 (RFC 6265 §5.2.1, §5.2.2)
+  let expires: number | undefined;
+  if (attrs.maxAge !== undefined) {
+    // Max-Age가 Expires보다 우선 (RFC 6265 §5.3 step 3)
+    if (attrs.maxAge <= 0) {
+      expires = 0; // 즉시 만료
+    } else {
+      expires = now + attrs.maxAge * 1000;
+    }
+  } else if (attrs.expires !== undefined) {
+    expires = attrs.expires;
+  }
+
+  // SameSite=None 은 Secure 필수
+  const sameSite = attrs.sameSite ?? 'lax';
+  const secure = sameSite === 'none' ? true : (attrs.secure ?? false);
+
+  return {
+    name,
+    value,
+    domain,
+    path,
+    expires,
+    secure,
+    httpOnly: attrs.httpOnly ?? false,
+    sameSite,
+    creationTime: now,
+    lastAccessTime: now,
+  };
+}
+
+interface ParsedAttributes {
+  domain?: string;
+  path?: string;
+  expires?: number;
+  maxAge?: number;
+  secure?: boolean;
+  httpOnly?: boolean;
+  sameSite?: 'strict' | 'lax' | 'none';
+}
+
+function parseAttributes(attrString: string): ParsedAttributes {
+  const result: ParsedAttributes = {};
+  if (!attrString) return result;
+
+  const parts = attrString.split(';');
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+
+    const eqIdx = trimmed.indexOf('=');
+    const attrName =
+      eqIdx === -1
+        ? trimmed.toLowerCase()
+        : trimmed.slice(0, eqIdx).trim().toLowerCase();
+    const attrValue = eqIdx === -1 ? '' : trimmed.slice(eqIdx + 1).trim();
+
+    switch (attrName) {
+      case 'domain':
+        result.domain = attrValue;
+        break;
+      case 'path':
+        result.path = attrValue;
+        break;
+      case 'expires': {
+        const date = new Date(attrValue);
+        if (!isNaN(date.getTime())) {
+          result.expires = date.getTime();
+        }
+        break;
+      }
+      case 'max-age': {
+        const num = parseInt(attrValue, 10);
+        if (!isNaN(num)) {
+          result.maxAge = num;
+        }
+        break;
+      }
+      case 'secure':
+        result.secure = true;
+        break;
+      case 'httponly':
+        result.httpOnly = true;
+        break;
+      case 'samesite':
+        switch (attrValue.toLowerCase()) {
+          case 'strict':
+            result.sameSite = 'strict';
+            break;
+          case 'lax':
+            result.sameSite = 'lax';
+            break;
+          case 'none':
+            result.sameSite = 'none';
+            break;
+        }
+        break;
+    }
+  }
+
+  return result;
+}
+
+/** RFC 6265 §5.1.4 default-path */
+function defaultPath(pathname: string): string {
+  if (!pathname || pathname[0] !== '/') return '/';
+  const lastSlash = pathname.lastIndexOf('/');
+  if (lastSlash <= 0) return '/';
+  return pathname.slice(0, lastSlash);
+}
+
+function parseUrl(
+  urlString: string,
+): { hostname: string; pathname: string; protocol: string } | null {
+  try {
+    const u = new URL(urlString);
+    return {
+      hostname: u.hostname.toLowerCase(),
+      pathname: u.pathname,
+      protocol: u.protocol,
+    };
+  } catch {
+    return null;
+  }
+}

@@ -1,0 +1,32 @@
+name: "\U0001F680 Feature Request"
+description: 새 기능 제안
+labels: ["feature", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 어떤 문제를 해결하나요?
+      description: |
+        "X를 하고 싶은데 현재 Y라서 못 한다" 형식으로
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 제안하는 해결책
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 검토한 대안
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 영향 범위
+      options:
+        - 단일 패키지
+        - 여러 패키지
+        - 전체 아키텍처
+        - Breaking Change
