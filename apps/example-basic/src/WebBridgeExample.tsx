@@ -10,7 +10,7 @@ import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
 import { setupWebBridge, http, HttpResponse } from '@webbridge-native/preset';
 
 // 1. WebBridge 설정 (앱 전역에서 한 번만)
-const { client, cookieJar, mockServer, dispose } = setupWebBridge({
+const { client, cookieJar, dispose } = setupWebBridge({
   cookies: true,
   headers: { userAgent: 'browser-like' },
   mock: {
