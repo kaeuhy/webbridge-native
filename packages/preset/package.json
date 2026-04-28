@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/preset",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Tier 1 convenience preset for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

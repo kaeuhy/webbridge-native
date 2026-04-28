@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core interfaces, types, and request pipeline for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

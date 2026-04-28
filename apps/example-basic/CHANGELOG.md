@@ -4,8 +4,7 @@
 
 ### Patch Changes
 
-- Updated dependencies [e623e91]
-- Updated dependencies [7734159]
+- Updated dependencies
   - @webbridge-native/core@0.2.0
   - @webbridge-native/mock@0.2.0
   - @webbridge-native/preset@0.2.0
