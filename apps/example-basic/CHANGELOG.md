@@ -1,5 +1,14 @@
 # @webbridge-native/example-basic
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @webbridge-native/preset@0.4.0
+  - @webbridge-native/mock@0.4.0
+  - @webbridge-native/core@0.4.0
+
 ## 0.2.0
 
 ### Patch Changes

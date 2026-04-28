@@ -16,5 +16,6 @@ module.exports = {
     '^@webbridge-native/devtools$': '<rootDir>/../devtools/src',
     '^@webbridge-native/cors$': '<rootDir>/../cors/src',
     '^@webbridge-native/sse$': '<rootDir>/../sse/src',
+    '^@webbridge-native/native-bridge$': '<rootDir>/../native-bridge/src',
   },
 };

@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/adapter-react-query",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "React Query integration for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

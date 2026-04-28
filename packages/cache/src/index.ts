@@ -7,3 +7,5 @@ export { cacheInterceptor } from './interceptor';
 export type { CacheInterceptorOptions } from './interceptor';
 export { parseCacheControl, isCacheable } from './cache-control';
 export type { CacheDirectives } from './cache-control';
+export { PersistentHttpCache } from './persistent-cache';
+export type { CacheStorageAdapter, PersistentCacheOptions } from './persistent-cache';
