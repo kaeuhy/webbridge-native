@@ -1,5 +1,13 @@
 # @webbridge-native/cors
 
+## 0.4.0
+
+### Patch Changes
+
+- Add @webbridge-native/native-bridge — native network bridge for iOS (NSURLProtocol) and Android (OkHttp Network Interceptor) DevTools visibility. Update preset with nativeBridge option. Export findHandler from mock package.
+- Updated dependencies
+  - @webbridge-native/core@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes
