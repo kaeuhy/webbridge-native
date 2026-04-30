@@ -7,14 +7,6 @@
 /** Accepted encoding labels that map to UTF-8. */
 const UTF8_LABELS = new Set(['utf-8', 'utf8', 'unicode-1-1-utf-8']);
 
-/** UTF-8 BOM: EF BB BF */
-const BOM_0 = 0xef;
-const BOM_1 = 0xbb;
-const BOM_2 = 0xbf;
-
-/** Unicode replacement character. */
-const REPLACEMENT_CHAR = '\uFFFD';
-
 /**
  * Options for the {@link WBTextDecoder} constructor.
  */
