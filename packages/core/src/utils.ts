@@ -67,6 +67,9 @@ export function createResponse(
   init: Partial<WebBridgeResponse> & { status?: number },
 ): WebBridgeResponse {
   const status = init.status ?? 200;
+  if (!Number.isInteger(status) || status < 0 || status > 999) {
+    throw new RangeError(`Invalid HTTP status code: ${status}`);
+  }
   return {
     url: init.url ?? '',
     status,

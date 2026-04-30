@@ -35,8 +35,8 @@ export function matchUrl(
   url: string,
 ): Record<string, string> | null {
   // 쿼리스트링 제거
-  const cleanUrl = url.split('?')[0];
-  const cleanPattern = pattern.split('?')[0];
+  const cleanUrl = url.split('?')[0].replace(/\/+$/, '');
+  const cleanPattern = pattern.split('?')[0].replace(/\/+$/, '');
 
   const patternParts = cleanPattern.split('/');
   const urlParts = cleanUrl.split('/');
@@ -53,7 +53,11 @@ export function matchUrl(
     const params: Record<string, string> = {};
     for (let i = 0; i < prefixParts.length; i++) {
       if (prefixParts[i].startsWith(':')) {
-        params[prefixParts[i].slice(1)] = urlParts[i];
+        try {
+          params[prefixParts[i].slice(1)] = decodeURIComponent(urlParts[i]);
+        } catch {
+          params[prefixParts[i].slice(1)] = urlParts[i];
+        }
       }
     }
     return params;
@@ -65,7 +69,11 @@ export function matchUrl(
 
   for (let i = 0; i < patternParts.length; i++) {
     if (patternParts[i].startsWith(':')) {
-      params[patternParts[i].slice(1)] = urlParts[i];
+      try {
+        params[patternParts[i].slice(1)] = decodeURIComponent(urlParts[i]);
+      } catch {
+        params[patternParts[i].slice(1)] = urlParts[i];
+      }
     } else if (patternParts[i] !== urlParts[i]) {
       return null;
     }

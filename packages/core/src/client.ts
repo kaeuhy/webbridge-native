@@ -71,16 +71,42 @@ export class WebBridgeClient {
     }
 
     const interceptor = this.interceptors[index];
+    let nextPending = false;
     const next = (req: WebBridgeRequest): Promise<WebBridgeResponse> => {
+      if (nextPending) {
+        return Promise.reject(
+          new Error(
+            'WebBridgeClient: next() called while a previous next() call is still pending. ' +
+              'Await the previous next() call before calling it again.',
+          ),
+        );
+      }
+      nextPending = true;
       // AbortSignal 체크
       if (req.signal?.aborted) {
+        nextPending = false;
         return Promise.reject(
           new DOMException('The operation was aborted.', 'AbortError'),
         );
       }
-      return this.executeChain(req, index + 1);
+      return this.executeChain(req, index + 1).finally(() => {
+        nextPending = false;
+      });
     };
 
-    return interceptor(request, next);
+    try {
+      const result = interceptor(request, next);
+      // async 인터셉터의 rejected promise에서 non-Error 값을 래핑
+      return Promise.resolve(result).catch((thrown: unknown) => {
+        if (thrown instanceof Error) throw thrown;
+        throw new Error(String(thrown));
+      });
+    } catch (thrown: unknown) {
+      // 동기적으로 throw된 non-Error 값을 래핑
+      if (thrown instanceof Error) {
+        return Promise.reject(thrown);
+      }
+      return Promise.reject(new Error(String(thrown)));
+    }
   }
 }

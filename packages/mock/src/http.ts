@@ -24,4 +24,6 @@ export const http = {
   put: createMethodHandler('PUT'),
   delete: createMethodHandler('DELETE'),
   patch: createMethodHandler('PATCH'),
+  head: createMethodHandler('HEAD'),
+  options: createMethodHandler('OPTIONS'),
 };
