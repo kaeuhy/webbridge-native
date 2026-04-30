@@ -4,17 +4,12 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "@webbridge-native/core": ["../core/src"],
-      "@webbridge-native/mock": ["../mock/src"],
-      "@webbridge-native/cookies": ["../cookies/src"],
-      "@webbridge-native/headers": ["../headers/src"]
+      "@webbridge-native/core": ["../core/src"]
     }
   },
   "include": ["src"],
+  "exclude": ["src/**/*.test.ts"],
   "references": [
-    { "path": "../core" },
-    { "path": "../mock" },
-    { "path": "../cookies" },
-    { "path": "../headers" }
+    { "path": "../core" }
   ]
 }

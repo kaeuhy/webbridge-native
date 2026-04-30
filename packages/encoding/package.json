@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/encoding",
-  "version": "0.6.1",
+  "version": "0.6.0",
   "description": "WHATWG Encoding API polyfill (TextEncoder, TextDecoder, atob, btoa) for React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

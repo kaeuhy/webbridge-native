@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/native-bridge",
-  "version": "0.6.1",
+  "version": "0.6.0",
   "description": "Native network bridge for WebBridge Native — iOS NSURLProtocol & Android OkHttp interceptor for DevTools visibility",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

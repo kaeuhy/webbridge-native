@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/crypto",
-  "version": "0.6.1",
+  "version": "0.6.0",
   "description": "Web Crypto API polyfill (getRandomValues, randomUUID) for React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
