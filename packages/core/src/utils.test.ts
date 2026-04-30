@@ -111,4 +111,23 @@ describe('createResponse', () => {
     headers['X-Custom'] = 'modified';
     expect(res.headers['X-Custom']).toBe('value');
   });
+
+  it('throws RangeError for negative status', () => {
+    expect(() => createResponse({ status: -1 })).toThrow(RangeError);
+    expect(() => createResponse({ status: -1 })).toThrow('Invalid HTTP status code: -1');
+  });
+
+  it('throws RangeError for NaN status', () => {
+    expect(() => createResponse({ status: NaN })).toThrow(RangeError);
+  });
+
+  it('throws RangeError for status > 999', () => {
+    expect(() => createResponse({ status: 1000 })).toThrow(RangeError);
+  });
+
+  it('accepts status 0 for error responses', () => {
+    const res = createResponse({ status: 0, type: 'error' });
+    expect(res.status).toBe(0);
+    expect(res.type).toBe('error');
+  });
 });
