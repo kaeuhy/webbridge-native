@@ -36,6 +36,14 @@ client.use(headerInterceptor({
 
 Headers that are already set on the request are never overwritten.
 
+### Exports
+
+| Export | Type | Description |
+|---|---|---|
+| `headerInterceptor` | Function | Creates the header injection interceptor |
+| `buildUserAgent` | Function | Builds a browser-like User-Agent string from device info |
+| `HeaderInterceptorOptions` | Type | Options for `headerInterceptor()` |
+
 ## License
 
 MIT

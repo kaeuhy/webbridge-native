@@ -43,7 +43,7 @@ import { DevToolsPanel } from '@webbridge-native/devtools';
 const panel = new DevToolsPanel(logger);
 panel.setFilter({ method: 'GET', minStatus: 400 });
 panel.onUpdate((entries) => { /* update your custom UI */ });
-panel.getSummary(); // { total, success, error, cached, avgDuration }
+panel.getSummary(); // { total, success, error, cached, avgDuration, totalSize }
 ```
 
 ### 4. HAR / curl
