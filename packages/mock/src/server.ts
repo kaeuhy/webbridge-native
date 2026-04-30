@@ -99,7 +99,7 @@ export class MockServer {
         const wrapped = new Error(
           `[WebBridge Mock] Handler error for ${request.method} ${request.url}: ${message}`,
         );
-        (wrapped as any).cause = error;
+        Object.defineProperty(wrapped, 'cause', { value: error });
         throw wrapped;
       }
     };

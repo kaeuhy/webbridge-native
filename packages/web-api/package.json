@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/web-api",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Fetch API compatible Web APIs (Headers, Response, Request, FormData serializer) for React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

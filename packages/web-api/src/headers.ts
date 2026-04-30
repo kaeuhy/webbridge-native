@@ -9,7 +9,8 @@
  */
 
 const INVALID_HEADER_NAME = /[^a-zA-Z0-9\-!#$%&'*+.^_`|~]/;
-const INVALID_HEADER_VALUE = /[\x00-\x08\x0a-\x1f\x7f]/;
+// eslint-disable-next-line no-control-regex
+const INVALID_HEADER_VALUE = new RegExp('[\\x00-\\x08\\x0a-\\x1f\\x7f]');
 
 function validateHeaderName(name: string): void {
   if (name.length === 0) {
