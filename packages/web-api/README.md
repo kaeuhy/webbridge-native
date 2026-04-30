@@ -1,15 +1,15 @@
 # @webbridge-native/web-api
 
-Fetch API compatible Web APIs (Headers, Response, Request, FormData serializer) for React Native.
+Fetch API compatible Web APIs for React Native -- Headers, Response, Request, FormData serializer, and AbortSignal extensions.
 
 ## Why
 
-React Native's networking layer uses plain objects (`Record<string, string>`) for headers and responses. This package provides spec-compliant `Headers`, `Response`, and `Request` classes that seamlessly interop with WebBridge Native's interceptor chain via `fromWebBridge()` / `toWebBridge()` methods.
+React Native's networking layer uses plain objects (`Record<string, string>`) for headers and responses. This package provides spec-compliant `Headers`, `Response`, and `Request` classes that interop seamlessly with WebBridge Native's interceptor chain via `fromWebBridge()` / `toWebBridge()` methods.
 
 ## Installation
 
 ```bash
-npm install @webbridge-native/web-api
+pnpm add @webbridge-native/web-api
 ```
 
 ## Usage
@@ -73,6 +73,17 @@ const signal = abortSignalTimeout(5000); // 5s timeout
 const combined = abortSignalAny([signal, controller.signal]);
 ```
 
-## API
+## API Reference
 
-See the TypeScript declarations for full API documentation.
+| Export | Description |
+|---|---|
+| `WBHeaders` | Spec-compliant Headers (case-insensitive, iterable, multi-value) |
+| `WBResponse` | Response with `.json()`, `.text()`, `.clone()`, `.fromWebBridge()` |
+| `WBRequest` | Request with `.toWebBridge()` conversion |
+| `serializeFormData` | Multipart form data serializer |
+| `abortSignalTimeout` | `AbortSignal.timeout()` polyfill |
+| `abortSignalAny` | `AbortSignal.any()` polyfill |
+
+## License
+
+MIT

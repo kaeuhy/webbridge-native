@@ -1,22 +1,18 @@
 # @webbridge-native/adapter-axios
 
-> 기존 RN axios 프로젝트에 브라우저 시맨틱을 적용.
+Drop-in axios adapter that routes requests through the WebBridge interceptor chain.
 
-## Problem
+## Why
 
-RN 프로젝트에서 axios를 사용 중인데, 쿠키/캐시/헤더를 브라우저처럼 자동 관리하고 싶습니다. axios를 걷어내지 않고 기존 코드를 유지하면서요.
+You have an existing React Native project using axios and want browser-grade cookies, caching, and headers -- without rewriting your API layer. This adapter swaps the transport under axios so every request flows through WebBridge.
 
-## Solution
-
-axios adapter를 교체하여 WebBridge 인터셉터 체인을 통과하게 합니다. 기존 axios 코드 변경 없음.
-
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/adapter-axios @webbridge-native/core @webbridge-native/preset axios
 ```
 
-## 사용법
+## Usage
 
 ```typescript
 import axios from 'axios';
@@ -26,21 +22,21 @@ import { createAxiosAdapter } from '@webbridge-native/adapter-axios';
 const { client } = setupWebBridge({ cookies: true });
 
 const api = axios.create({
-  baseURL: 'https://api.myapp.com',
+  baseURL: 'https://api.example.com',
   adapter: createAxiosAdapter(client),
 });
 
-// 기존 코드 그대로 — 쿠키/캐시/헤더 자동 적용
+// Existing code unchanged -- cookies, cache, and headers are applied automatically
 const { data } = await api.get('/users');
 ```
 
-## 지원 기능
+## Supported Features
 
-- baseURL, params, paramsSerializer
-- timeout (AbortSignal 기반)
-- validateStatus
+- `baseURL`, `params`, `paramsSerializer`
+- `timeout` (AbortSignal-based)
+- `validateStatus`
 - JSON auto-parsing
-- signal (AbortController)
+- `signal` (AbortController)
 
 ## License
 

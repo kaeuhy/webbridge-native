@@ -1,24 +1,22 @@
 # @webbridge-native/cookies
 
-> RN에서 브라우저처럼 쿠키를 자동 관리. RFC 6265 준수.
+Automatic cookie management for React Native, just like a browser. RFC 6265 compliant.
 
-## Problem
+## Why
 
-브라우저는 `Set-Cookie`를 자동 저장하고 다음 요청에 `Cookie` 헤더를 자동 첨부합니다. React Native는 이걸 안 합니다. RN 공식 문서: *"Cookie based authentication is currently unstable."*
+Browsers automatically store `Set-Cookie` headers and attach `Cookie` headers to subsequent requests. React Native does not. As the RN docs note: *"Cookie based authentication is currently unstable."*
 
-## Solution
+This package provides an RFC 6265 compliant `CookieJar` that handles cookie management identically to a browser.
 
-RFC 6265 준수 CookieJar가 RN에서 브라우저와 동일하게 쿠키를 자동 관리합니다.
-
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/cookies @webbridge-native/core
 ```
 
-## 사용법
+## Usage
 
-### 인터셉터로 사용 (권장)
+### As an Interceptor (recommended)
 
 ```typescript
 import { CookieJar, cookieInterceptor } from '@webbridge-native/cookies';
@@ -26,23 +24,23 @@ import { CookieJar, cookieInterceptor } from '@webbridge-native/cookies';
 const jar = new CookieJar();
 client.use(cookieInterceptor({ jar }));
 
-// 이제 RN에서도 브라우저처럼:
-// 1. 로그인 응답의 Set-Cookie → 자동 저장
-// 2. 다음 요청에 Cookie 헤더 → 자동 첨부
-await client.fetch('https://api.myapp.com/login', { method: 'POST', body: '...' });
-await client.fetch('https://api.myapp.com/me'); // Cookie 자동 첨부됨
+// Now it works like a browser:
+// 1. Login response Set-Cookie -> automatically stored
+// 2. Next request Cookie header -> automatically attached
+await client.fetch('https://api.example.com/login', { method: 'POST', body: '...' });
+await client.fetch('https://api.example.com/me'); // Cookie attached automatically
 ```
 
-### 직접 사용
+### Direct API
 
 ```typescript
 const jar = new CookieJar();
-await jar.setCookie('session=abc; Path=/; HttpOnly; Secure', 'https://api.myapp.com');
-const header = await jar.getCookieHeader('https://api.myapp.com/users');
-// → 'session=abc'
+await jar.setCookie('session=abc; Path=/; HttpOnly; Secure', 'https://api.example.com');
+const header = await jar.getCookieHeader('https://api.example.com/users');
+// -> 'session=abc'
 ```
 
-### 영속 저장 (앱 재시작 후 세션 유지)
+### Persistent Storage (survive app restarts)
 
 ```typescript
 import { PersistentCookieStore } from '@webbridge-native/cookies';
@@ -54,15 +52,15 @@ const store = new PersistentCookieStore({
 });
 ```
 
-## 브라우저 호환 기능
+## Browser-Compatible Features
 
-- SameSite (Strict, Lax, None) — None은 Secure 강제
-- HttpOnly, Secure flag
-- Domain/Path 매칭 (RFC 6265 §5.1.3, §5.1.4)
-- Max-Age / Expires (Max-Age 우선)
-- Public Suffix 검증 (supercookie 공격 방지)
-- 다중 Set-Cookie 헤더 지원
-- 도메인별 50개, 전체 3000개 제한
+- SameSite (Strict, Lax, None) -- None enforces Secure
+- HttpOnly, Secure flags
+- Domain/Path matching (RFC 6265 SS5.1.3, SS5.1.4)
+- Max-Age / Expires (Max-Age takes precedence)
+- Public Suffix validation (prevents supercookie attacks)
+- Multiple Set-Cookie headers
+- Per-domain limit of 50 cookies, global limit of 3000
 
 ## License
 

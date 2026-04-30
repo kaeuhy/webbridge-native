@@ -1,16 +1,16 @@
 # @webbridge-native/devtools
 
-> RN 인앱 네트워크 인스펙터. 요청 목록, 상세 보기, HAR export, curl 복사.
+In-app network inspector for React Native. Request list, detail view, HAR export, and curl copy.
 
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/devtools @webbridge-native/core
 ```
 
-## 사용법
+## Usage
 
-### 1. 인터셉터 등록
+### 1. Register the Interceptor
 
 ```typescript
 import { RequestLogger, devtoolsInterceptor } from '@webbridge-native/devtools';
@@ -19,7 +19,7 @@ const logger = new RequestLogger({ maxEntries: 500, maxBodySize: 64 * 1024 });
 client.use(devtoolsInterceptor({ logger }));
 ```
 
-### 2. UI 패널 (React Native 컴포넌트)
+### 2. UI Panel (React Native component)
 
 ```tsx
 import { DevToolsScreen } from '@webbridge-native/devtools/ui';
@@ -29,39 +29,39 @@ import { DevToolsScreen } from '@webbridge-native/devtools/ui';
   {() => <DevToolsScreen logger={logger} />}
 </Stack.Screen>
 
-// 또는 Modal
+// Or as a Modal
 <Modal visible={showDevTools}>
   <DevToolsScreen logger={logger} onClose={() => setShowDevTools(false)} />
 </Modal>
 ```
 
-### 3. 데이터 레이어 (커스텀 UI용)
+### 3. Data Layer (for custom UI)
 
 ```typescript
 import { DevToolsPanel } from '@webbridge-native/devtools';
 
 const panel = new DevToolsPanel(logger);
 panel.setFilter({ method: 'GET', minStatus: 400 });
-panel.onUpdate((entries) => { /* 커스텀 UI 업데이트 */ });
-panel.getSummary(); // { total, success, error, cached, avgDuration }
+panel.onUpdate((entries) => { /* update your custom UI */ });
+panel.getSummary(); // { total, success, error, cached, avgDuration, totalSize }
 ```
 
 ### 4. HAR / curl
 
 ```typescript
 const har = logger.toHAR();        // HAR 1.2 export
-const curl = logger.toCurl(entry); // curl 명령 생성
+const curl = logger.toCurl(entry); // Generate curl command
 ```
 
-## UI 컴포넌트
+## Components
 
-| 컴포넌트 | 설명 |
+| Component | Description |
 |---|---|
-| `DevToolsScreen` | 전체 화면 (목록 + 상세) |
-| `NetworkList` | 요청 목록 (검색, 필터, 통계) |
-| `RequestDetail` | 요청/응답 상세 (헤더, body, curl) |
+| `DevToolsScreen` | Full-screen view (list + detail) |
+| `NetworkList` | Request list with search, filters, and stats |
+| `RequestDetail` | Request/response detail (headers, body, curl) |
 
-**Production**: `@webbridge-native/babel-plugin-strip-dev`로 자동 제거.
+**Production**: Automatically stripped by `@webbridge-native/babel-plugin-strip-dev`.
 
 ## License
 

@@ -1,42 +1,40 @@
 # @webbridge-native/redirect
 
-> RN에서 브라우저와 동일한 리다이렉트 처리.
+Browser-identical redirect handling for React Native.
 
-## Problem
+## Why
 
-RN의 기본 redirect 처리는 브라우저와 다릅니다: `redirect: 'manual'`이 부정확하고, 크로스 오리진 리다이렉트 시 Authorization 헤더가 그대로 전달되어 **토큰 유출 위험**이 있습니다.
+React Native's default redirect behavior differs from browsers: `redirect: 'manual'` is unreliable, and cross-origin redirects leak `Authorization` headers -- a **token exposure risk**.
 
-## Solution
+This package implements the Fetch spec's redirect algorithm exactly as browsers do.
 
-브라우저 Fetch 스펙과 동일한 리다이렉트 동작을 RN에 제공합니다.
-
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/redirect @webbridge-native/core
 ```
 
-## 사용법
+## Usage
 
 ```typescript
 import { redirectInterceptor } from '@webbridge-native/redirect';
 
 client.use(redirectInterceptor());
 
-// 자동 follow (최대 5회)
-const res = await client.fetch('https://api.myapp.com/old');
-// res.redirected === true, res.url === 최종 URL
+// Automatic follow (up to 5 hops)
+const res = await client.fetch('https://api.example.com/old-endpoint');
+// res.redirected === true, res.url === final URL
 ```
 
-## 브라우저 호환 동작
+## Redirect Behavior
 
-| 상태 | 메서드 변경 | 보안 |
+| Status | Method Change | Security |
 |---|---|---|
-| 301, 302, 303 | → GET, body 제거 | cross-origin 시 Auth/Cookie strip |
-| 307, 308 | 유지 | cross-origin 시 Auth/Cookie strip |
+| 301, 302, 303 | Changes to GET, body removed | Strips Auth/Cookie on cross-origin |
+| 307, 308 | Method preserved | Strips Auth/Cookie on cross-origin |
 
-- `redirect: 'manual'` → 3xx 응답 그대로 반환
-- `redirect: 'error'` → 3xx 시 에러
+- `redirect: 'manual'` -- Returns the 3xx response as-is
+- `redirect: 'error'` -- Throws on 3xx
 
 ## License
 
