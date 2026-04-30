@@ -1,0 +1,19 @@
+{
+  "name": "@webbridge-native/web-api",
+  "version": "0.5.0",
+  "description": "Fetch API compatible Web APIs (Headers, Response, Request, FormData serializer) for React Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@webbridge-native/core": "workspace:*"
+  },
+  "license": "MIT",
+  "publishConfig": { "access": "public" }
+}
