@@ -1,6 +1,6 @@
 {
   "name": "@webbridge-native/mock",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "MSW-compatible mocking for WebBridge Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
