@@ -15,11 +15,7 @@ import type { Interceptor } from '@webbridge-native/core';
 import { setupServer, http, HttpResponse } from '@webbridge-native/mock';
 import { cookieInterceptor, CookieJar } from '@webbridge-native/cookies';
 import { headerInterceptor } from '@webbridge-native/headers';
-import { WBHeaders } from './headers';
-import { WBResponse } from './response';
-import { WBRequest } from './request';
-import { serializeFormData } from './form-data-serializer';
-import { abortSignalTimeout } from './abort-signal-ext';
+import { WBHeaders, WBResponse, WBRequest, serializeFormData, abortSignalTimeout } from '@webbridge-native/web-api';
 
 const API = 'https://task-api.wisoft.io/batchar';
 
