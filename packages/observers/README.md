@@ -100,6 +100,14 @@ wbRequestIdleCallback(
 | `disconnect()` | Stop observing |
 | `takeRecords()` | Get buffered entries |
 
+### WBPerformanceObserverEntryList
+
+| Method | Description |
+|--------|-------------|
+| `getEntries()` | Get all observed entries |
+| `getEntriesByType(type)` | Filter observed entries by type |
+| `getEntriesByName(name, type?)` | Filter observed entries by name |
+
 ### requestIdleCallback
 
 | Function | Description |

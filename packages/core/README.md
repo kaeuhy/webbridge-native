@@ -63,6 +63,7 @@ deleteHeader(headers, 'cookie');     // Remove header
 | `hasHeader()` | Check if header exists |
 | `setHeaderIfAbsent()` | Set header only if not already present |
 | `deleteHeader()` | Remove a header |
+| `generateRequestId()` | Generate a unique request ID |
 
 ## License
 

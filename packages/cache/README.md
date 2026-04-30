@@ -36,6 +36,16 @@ client.use(cacheInterceptor({ cache }));
 - POST invalidates GET cache for the same URL (RFC 7234 SS4.4)
 - LRU eviction (maxEntries, maxSize)
 
+## API Reference
+
+| Export | Type | Description |
+|---|---|---|
+| `HttpCache` | Class | In-memory HTTP cache with LRU eviction |
+| `PersistentHttpCache` | Class | Persistent HTTP cache backed by AsyncStorage |
+| `cacheInterceptor` | Function | Creates the cache interceptor for WebBridgeClient |
+| `parseCacheControl` | Function | Parses a `Cache-Control` header string into a structured object |
+| `isCacheable` | Function | Determines if a request/response pair is cacheable per RFC 7234 |
+
 ## License
 
 MIT

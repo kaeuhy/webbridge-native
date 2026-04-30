@@ -122,8 +122,8 @@ Handles 50+ concurrent requests safely:
 
 ## Requirements
 
-- React Native 0.73+ (New Architecture / TurboModule)
-- iOS 13.4+
+- React Native 0.76+ (New Architecture / TurboModule)
+- iOS 15.1+
 - Android minSdk 24+
 
 ## License

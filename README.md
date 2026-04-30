@@ -192,7 +192,7 @@ Every layer is opt-in. Pick only the packages you need.
 
 Validated against production React Native app patterns:
 
-- 30+ REST API endpoint simulations
+- 50+ real-world API scenario simulations
 - Login/signup with token refresh and authenticated API calls
 - Real-time data streams (SSE) and chat-style messaging
 - React Query parallel requests (`Promise.all`)
