@@ -1,27 +1,23 @@
 # @webbridge-native/sse
 
-> RN에서 EventSource(Server-Sent Events) 지원.
+W3C EventSource (Server-Sent Events) polyfill for React Native.
 
-## Problem
+## Why
 
-브라우저는 `EventSource`를 기본 제공하지만, RN은 지원하지 않습니다.
+Browsers provide `EventSource` out of the box. React Native does not. This package implements the W3C EventSource spec with automatic reconnection, `last-event-id` tracking, and named events.
 
-## Solution
-
-W3C EventSource 스펙 호환 폴리필. fetch streaming 기반 자동 연결/재연결.
-
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/sse
 ```
 
-## 사용법
+## Usage
 
 ```typescript
 import { EventSource } from '@webbridge-native/sse';
 
-const es = new EventSource('https://api.myapp.com/events', {
+const es = new EventSource('https://api.example.com/events', {
   headers: { Authorization: 'Bearer token' },
 });
 
@@ -36,12 +32,12 @@ es.addEventListener('notification', (event) => {
 es.close();
 ```
 
-## 기능
+## Features
 
-- 자동 재연결 (configurable retry delay)
-- last-event-id 추적
+- Automatic reconnection with configurable retry delay
+- `last-event-id` tracking
 - Named events
-- CR/LF/CRLF 지원
+- CR / LF / CRLF line ending support
 
 ## License
 

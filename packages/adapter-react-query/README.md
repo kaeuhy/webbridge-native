@@ -1,14 +1,14 @@
 # @webbridge-native/adapter-react-query
 
-> RN React Query 프로젝트에 브라우저 시맨틱을 적용.
+React Query integration for WebBridge Native.
 
-## 설치
+## Installation
 
 ```bash
 pnpm add @webbridge-native/adapter-react-query @webbridge-native/core @webbridge-native/preset @tanstack/react-query
 ```
 
-## 사용법
+## Usage
 
 ```typescript
 import { useQuery } from '@tanstack/react-query';
@@ -16,7 +16,7 @@ import { setupWebBridge } from '@webbridge-native/preset';
 import { createFetcher } from '@webbridge-native/adapter-react-query';
 
 const { client } = setupWebBridge({ cookies: true });
-const fetcher = createFetcher(client, { baseURL: 'https://api.myapp.com' });
+const fetcher = createFetcher(client, { baseURL: 'https://api.example.com' });
 
 function useUser(id: string) {
   return useQuery({
@@ -26,11 +26,13 @@ function useUser(id: string) {
 }
 ```
 
-### Fetcher 메서드
+## Fetcher Methods
 
-- `fetcher.json<T>(url, init?)` — JSON 파싱, non-2xx 시 FetchError throw
-- `fetcher.text(url, init?)` — 텍스트 반환
-- `fetcher.raw(url, init?)` — WebBridgeResponse 반환
+| Method | Description |
+|---|---|
+| `fetcher.json<T>(url, init?)` | Parse JSON response. Throws `FetchError` on non-2xx |
+| `fetcher.text(url, init?)` | Return response as text |
+| `fetcher.raw(url, init?)` | Return raw `WebBridgeResponse` |
 
 ## License
 
