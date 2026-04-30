@@ -35,7 +35,6 @@ export class WBTransformStream<I = unknown, O = unknown> {
     const t = transformer ?? {};
 
     let readableController!: ReadableStreamDefaultController<O>;
-    let transformController: TransformStreamDefaultControllerImpl<O>;
 
     this.readable = new WBReadableStream<O>({
       start(controller) {
@@ -43,7 +42,7 @@ export class WBTransformStream<I = unknown, O = unknown> {
       },
     });
 
-    transformController = new TransformStreamDefaultControllerImpl<O>(readableController);
+    const transformController = new TransformStreamDefaultControllerImpl<O>(readableController);
 
     const startPromise = t.start
       ? Promise.resolve(t.start(transformController))
