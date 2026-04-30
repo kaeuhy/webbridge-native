@@ -1,5 +1,5 @@
 import { WebBridgeClient } from './client';
-import type { Interceptor, WebBridgeResponse } from './types';
+import { Interceptor, WebBridgeResponse } from './types';
 import { createResponse } from './utils';
 
 /** 항상 고정 응답을 반환하는 터미널 인터셉터 */
@@ -152,6 +152,58 @@ describe('WebBridgeClient', () => {
       await expect(
         client.fetch('https://example.com', { signal: controller.signal }),
       ).rejects.toThrow('aborted');
+    });
+
+    it('wraps non-Error thrown values from interceptors', async () => {
+      const throwString: Interceptor = async () => {
+        throw 'string error'; // eslint-disable-line no-throw-literal
+      };
+
+      const client = new WebBridgeClient();
+      client.use(throwString);
+
+      const rejection = client.fetch('https://example.com');
+      await expect(rejection).rejects.toThrow('string error');
+      await expect(rejection).rejects.toBeInstanceOf(Error);
+    });
+
+    it('throws when next() is called concurrently (without awaiting)', async () => {
+      let secondCallError: Error | null = null;
+
+      const concurrentNext: Interceptor = async (req, next) => {
+        const p1 = next(req);
+        // 첫 번째가 아직 pending 중에 두 번째 호출
+        const p2 = next(req).catch((e: Error) => { secondCallError = e; });
+        await p2;
+        return p1;
+      };
+
+      const client = new WebBridgeClient();
+      client.use(concurrentNext).use(terminalInterceptor);
+      await client.fetch('https://example.com');
+
+      expect(secondCallError).toBeInstanceOf(Error);
+      expect(secondCallError!.message).toContain(
+        'next() called while a previous next() call is still pending',
+      );
+    });
+
+    it('allows sequential next() calls (redirect pattern)', async () => {
+      let callCount = 0;
+      const sequentialNext: Interceptor = async (req, next) => {
+        // 첫 번째 호출 await 후 두 번째 호출 — 리다이렉트 패턴
+        const res1 = await next(req);
+        if (callCount === 0) {
+          callCount++;
+          return next(req); // 이전 호출이 완료된 후이므로 허용
+        }
+        return res1;
+      };
+
+      const client = new WebBridgeClient();
+      client.use(sequentialNext).use(terminalInterceptor);
+      const res = await client.fetch('https://example.com');
+      expect(res.status).toBe(200);
     });
 
     it('passes RequestInit options through to the request', async () => {

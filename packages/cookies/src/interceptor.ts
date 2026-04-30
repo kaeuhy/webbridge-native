@@ -18,15 +18,22 @@ export function cookieInterceptor(
 
   return async (request, next) => {
     // 요청: Cookie 헤더 첨부
-    const cookieHeader = await jar.getCookieHeader(request.url);
-    if (cookieHeader) {
-      request = {
-        ...request,
-        headers: {
-          ...request.headers,
-          Cookie: cookieHeader,
-        },
-      };
+    try {
+      const cookieHeader = await jar.getCookieHeader(request.url);
+      if (cookieHeader) {
+        request = {
+          ...request,
+          headers: {
+            ...request.headers,
+            Cookie: cookieHeader,
+          },
+        };
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(
+        `[WebBridge Cookie] Failed to get cookie header for ${request.url}: ${message}`,
+      );
     }
 
     // 다음 인터셉터 실행
@@ -35,7 +42,14 @@ export function cookieInterceptor(
     // 응답: Set-Cookie 파싱
     const setCookieHeaders = getSetCookieHeaders(response);
     for (const header of setCookieHeaders) {
-      await jar.setCookie(header, request.url);
+      try {
+        await jar.setCookie(header, request.url);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          `[WebBridge Cookie] Failed to set cookie from ${request.url}: ${message}`,
+        );
+      }
     }
 
     return response;

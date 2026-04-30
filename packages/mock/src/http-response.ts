@@ -12,7 +12,15 @@ export const HttpResponse = {
     body: unknown,
     init?: { status?: number; headers?: Record<string, string> },
   ): WebBridgeResponse {
-    const jsonString = JSON.stringify(body);
+    let jsonString: string;
+    try {
+      jsonString = JSON.stringify(body);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new TypeError(
+        `HttpResponse.json(): Failed to serialize body — ${message}`,
+      );
+    }
     return createResponse({
       status: init?.status ?? 200,
       headers: {

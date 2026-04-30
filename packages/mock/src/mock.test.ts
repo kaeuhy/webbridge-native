@@ -36,6 +36,19 @@ describe('matchUrl', () => {
   it('returns null for length mismatch (no wildcard)', () => {
     expect(matchUrl('https://api.example.com/users', 'https://api.example.com/users/42')).toBeNull();
   });
+
+  it('decodes URL-encoded path segments in params', () => {
+    const result = matchUrl('https://api.example.com/users/:name', 'https://api.example.com/users/John%20Doe');
+    expect(result).toEqual({ name: 'John Doe' });
+  });
+
+  it('matches with trailing slash in URL', () => {
+    expect(matchUrl('https://api.example.com/users', 'https://api.example.com/users/')).toEqual({});
+  });
+
+  it('matches with trailing slash in pattern', () => {
+    expect(matchUrl('https://api.example.com/users/', 'https://api.example.com/users')).toEqual({});
+  });
 });
 
 describe('HttpResponse', () => {
@@ -56,6 +69,15 @@ describe('HttpResponse', () => {
     expect(res.status).toBe(200);
     expect(res.headers['Content-Type']).toBe('text/plain');
     expect(res.body).toBe('hello');
+  });
+
+  it('json() throws descriptive error on circular reference', () => {
+    const circular: Record<string, unknown> = { name: 'test' };
+    circular.self = circular;
+
+    expect(() => HttpResponse.json(circular)).toThrow(
+      'HttpResponse.json(): Failed to serialize body',
+    );
   });
 
   it('error() creates error response', () => {
@@ -90,6 +112,16 @@ describe('http', () => {
   it('creates PATCH handler', () => {
     const handler = http.patch('/api/test', () => HttpResponse.json({}));
     expect(handler.method).toBe('PATCH');
+  });
+
+  it('creates HEAD handler', () => {
+    const handler = http.head('/api/test', () => HttpResponse.json({}));
+    expect(handler.method).toBe('HEAD');
+  });
+
+  it('creates OPTIONS handler', () => {
+    const handler = http.options('/api/test', () => HttpResponse.json({}));
+    expect(handler.method).toBe('OPTIONS');
   });
 });
 
@@ -236,6 +268,25 @@ describe('setupServer', () => {
 
     const res = await client.fetch('https://api.example.com/unmatched');
     expect(res.body).toBe('real');
+
+    server.close();
+  });
+
+  it('wraps handler resolver errors with request context', async () => {
+    const server = setupServer(
+      http.get('https://api.example.com/crash', () => {
+        throw new Error('resolver bug');
+      }),
+    );
+    server.listen();
+
+    const terminal: Interceptor = async () => createResponse({ status: 200 });
+    const client = new WebBridgeClient();
+    client.use(server.createInterceptor()).use(terminal);
+
+    await expect(
+      client.fetch('https://api.example.com/crash'),
+    ).rejects.toThrow('[WebBridge Mock] Handler error for GET https://api.example.com/crash');
 
     server.close();
   });

@@ -87,12 +87,21 @@ export class MockServer {
         return this.handleUnmatched(request, next);
       }
 
-      const response = await match.handler.resolver({
-        params: match.params,
-        request,
-      });
+      try {
+        const response = await match.handler.resolver({
+          params: match.params,
+          request,
+        });
 
-      return response;
+        return response;
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        const wrapped = new Error(
+          `[WebBridge Mock] Handler error for ${request.method} ${request.url}: ${message}`,
+        );
+        (wrapped as any).cause = error;
+        throw wrapped;
+      }
     };
   }
 
