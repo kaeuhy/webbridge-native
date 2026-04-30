@@ -2,6 +2,12 @@
 
 WHATWG Streams API polyfill for React Native. Provides `ReadableStream`, `WritableStream`, and `TransformStream` implementations focused on HTTP response streaming.
 
+## Installation
+
+```bash
+pnpm add @webbridge-native/streams
+```
+
 ## Usage
 
 ```typescript
@@ -83,3 +89,7 @@ const byteStrategy = new ByteLengthQueuingStrategy({ highWaterMark: 65536 });
 - Proper state machine (readable/writable/closed/errored)
 - Backpressure via `desiredSize` and `highWaterMark`
 - Error propagation through pipelines
+
+## License
+
+MIT
