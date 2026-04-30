@@ -1,0 +1,16 @@
+{
+  "name": "@webbridge-native/storage",
+  "version": "0.6.0",
+  "description": "Web Storage API polyfill (localStorage, sessionStorage) for React Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts --max-warnings 0",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "publishConfig": { "access": "public" }
+}

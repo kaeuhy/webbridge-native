@@ -48,6 +48,10 @@ React Native는 JavaScript로 동작하지만, 브라우저가 기본 제공하�
 | [`@webbridge-native/web-api`](packages/web-api) | **Fetch API 호환** — WBHeaders, WBResponse, WBRequest, FormData 직렬화, AbortSignal.timeout |
 | [`@webbridge-native/encoding`](packages/encoding) | **WHATWG Encoding** — TextEncoder, TextDecoder, atob, btoa |
 | [`@webbridge-native/streams`](packages/streams) | **WHATWG Streams** — ReadableStream, WritableStream, TransformStream |
+| [`@webbridge-native/crypto`](packages/crypto) | **Web Crypto** — getRandomValues, randomUUID |
+| [`@webbridge-native/storage`](packages/storage) | **Web Storage** — localStorage, sessionStorage |
+| [`@webbridge-native/broadcast`](packages/broadcast) | **BroadcastChannel** — 앱 내 컴포넌트 간 통신 |
+| [`@webbridge-native/observers`](packages/observers) | **Performance API** — mark/measure, PerformanceObserver, requestIdleCallback |
 
 ### Layer 1 — Native Bridge
 
@@ -81,15 +85,6 @@ React Native는 JavaScript로 동작하지만, 브라우저가 기본 제공하�
 | [`@webbridge-native/devtools`](packages/devtools) | 인앱 네트워크 인스펙터 |
 | [`@webbridge-native/adapter-axios`](packages/adapter-axios) | axios 프로젝트 통합 |
 | [`@webbridge-native/adapter-react-query`](packages/adapter-react-query) | React Query 통합 |
-
-### 예정 (v0.6.0)
-
-| 패키지 | 설명 |
-|---|---|
-| `@webbridge-native/crypto` | Web Crypto API (getRandomValues, randomUUID) |
-| `@webbridge-native/storage` | localStorage / sessionStorage |
-| `@webbridge-native/broadcast` | BroadcastChannel |
-| `@webbridge-native/observers` | Performance API, requestIdleCallback |
 
 ## 빠른 시작
 
