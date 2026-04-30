@@ -14,7 +14,7 @@ React Native runs JavaScript, but ships without most of the Web APIs that browse
 |---|---|---|---|
 | `response.json()` / `.text()` / `.clone()` | Built-in | Incomplete | **`WBResponse`** |
 | `new Headers()` (case-insensitive, iterable) | Built-in | Incomplete | **`WBHeaders`** |
-| `TextEncoder` / `TextDecoder` | Built-in | Missing in Hermes | **Polyfill** |
+| `TextEncoder` / `TextDecoder` | Built-in | Missing or incomplete | **Polyfill** |
 | `ReadableStream` / `WritableStream` | Built-in | Partial | **Polyfill** |
 | `AbortSignal.timeout()` | Built-in | Missing | **Polyfill** |
 | `atob()` / `btoa()` | Built-in | Missing | **Polyfill** |
@@ -168,7 +168,7 @@ const fetcher = createFetcher(client, { baseURL: 'https://api.example.com' });
 ## Requirements
 
 - **React Native** 0.76+ (New Architecture)
-- **Hermes** engine
+- Any JS engine (Hermes, JSC, V8)
 - iOS 15.1+ / Android API 24+
 - Expo SDK 52+
 
