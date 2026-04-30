@@ -174,6 +174,8 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/encoding: {}
+
   packages/headers:
     dependencies:
       '@webbridge-native/core':
@@ -226,6 +228,14 @@ importers:
         version: link:../core
 
   packages/sse:
+    dependencies:
+      '@webbridge-native/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/streams: {}
+
+  packages/web-api:
     dependencies:
       '@webbridge-native/core':
         specifier: workspace:*
