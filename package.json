@@ -20,18 +20,18 @@
     "poc:devtools-visibility": "node scripts/poc-devtools-visibility.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@changesets/cli": "^2.27.0",
-    "@tanstack/react-query": "^5.100.5",
+    "@babel/core": "^8.0.1",
+    "@changesets/cli": "^2.31.1",
+    "@tanstack/react-query": "^5.101.2",
     "@types/jest": "^30.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.59.0",
-    "@typescript-eslint/parser": "^8.59.0",
-    "axios": "^1.15.2",
-    "eslint": "^8.19.0",
-    "jest": "^30.3.0",
-    "ts-jest": "^29.4.9",
-    "tsx": "^4.21.0",
-    "turbo": "^2.3.0",
-    "typescript": "~5.4.5"
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
+    "axios": "^1.18.1",
+    "eslint": "^10.7.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.23.1",
+    "turbo": "^2.10.5",
+    "typescript": "~7.0.2"
   }
 }
